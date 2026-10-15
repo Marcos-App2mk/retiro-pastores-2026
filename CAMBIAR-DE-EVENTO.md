@@ -29,7 +29,7 @@ You never need to edit the `.html`, `shared.js` or `api/` files.
 5. **Database** (Vercel project → Storage / Marketplace → Upstash Redis). Pick one:
    - **Separate database per event (simplest, fully isolated):** create/connect a new Upstash Redis to each project.
    - **One shared database:** connect the same database, then in *Settings → Environment Variables* add `EVENT_ID` with a different short value per event (e.g. `muj2027`). Data is then kept separate.
-6. **PINs** (Environment Variables, per project): `ADMIN_PIN` and `SCANNER_PIN`. If not set they default to 961271 and 2121. Redeploy after changing them.
+6. **PINs** (Environment Variables, per project): `ADMIN_PIN` and `SCANNER_PIN`. There are **no default PINs in the code**: if `ADMIN_PIN` is missing, nobody can open `/admin`; if `SCANNER_PIN` is missing, `/scanner` only accepts the admin PIN. Redeploy after adding or changing them.
 7. **Test:** register once, approve it in `/admin`, scan it in `/scanner`, then delete the test record.
 
 ## Checklist

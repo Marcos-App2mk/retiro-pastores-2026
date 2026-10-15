@@ -133,7 +133,7 @@ window.storage = {
     const t = setInterval(async ()=>cb(await window.storage.all(prefix)), 5000);
     return ()=>clearInterval(t);
   },
-  async auth(pin){ if(!API) return pin === ADMIN_PIN; try{ const j = await api({op:'auth', pin}); if(j.ok) SESSION_PIN = pin; return !!j.ok; }catch(e){ return 'error'; } },
+  async auth(pin){ if(!API) return !!ADMIN_PIN && pin === ADMIN_PIN; try{ const j = await api({op:'auth', pin}); if(j.ok) SESSION_PIN = pin; return !!j.ok; }catch(e){ window._authErr = String(e.message || e); return 'error'; } },
   async health(){ if(!API) return { ok:true }; try{ await api({op:'health'}); return { ok:true }; }catch(e){ return { ok:false, error:String(e.message||e) }; } },
   async mode(){ if(API) return 'api'; if(FB) return 'firebase'; return (await getDb()) ? 'db' : 'local'; }
 };
@@ -178,7 +178,7 @@ function aplicarEvento(sufijoTitulo){
   if(EV.colorAcentoOscuro) r.style.setProperty('--ember-dark', EV.colorAcentoOscuro);
   document.title = (EV.nombre || 'Evento') + (sufijoTitulo ? ' — ' + sufijoTitulo : '');
 }
-const ADMIN_PIN = '961271';
+const ADMIN_PIN = ''; // El PIN real está solo en Vercel (variable ADMIN_PIN)
 
 /* ---------- Código QR del participante e imagen para guardar o compartir ---------- */
 function qrPayload(registro){

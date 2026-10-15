@@ -471,7 +471,7 @@ async function doAdminLogin(){
   if(!tried) return;
   const ok = await window.storage.auth(tried);
   if(ok === 'error'){
-    err.textContent = 'No hay conexión con el servidor. La app debe estar publicada en Vercel (no en GitHub Pages) y desplegada de nuevo después de agregar las variables.';
+    err.textContent = (window._authErr && window._authErr.includes('ADMIN_PIN')) ? window._authErr : 'No hay conexión con el servidor. La app debe estar publicada en Vercel (no en GitHub Pages) y desplegada de nuevo después de agregar las variables.';
   } else if(ok){
     try{ sessionStorage.setItem('ciyPin', tried); }catch(e){}
     input.value = '';

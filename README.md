@@ -9,8 +9,9 @@ Se publica en **Vercel** desde GitHub. No necesita Firebase.
 2. **Vercel:** *Add New → Project* → importa el repositorio → *Deploy* (sin configurar nada más).
 3. **Base de datos:** en el proyecto de Vercel, pestaña *Storage* → *Create Database* → elige **Upstash for Redis** (plan gratis) → conéctala al proyecto. Vercel agrega solas las variables `KV_REST_API_URL` y `KV_REST_API_TOKEN`.
 4. **Variables (Settings → Environment Variables):**
-   - `ADMIN_PIN` — el PIN del administrador (si no lo pones, se usa `961271`). Cámbialo.
-   - `SCANNER_PIN` — el PIN del escáner de comidas (si no lo pones, se usa `2121`). Cámbialo.
+   - `ADMIN_PIN` — el PIN del administrador. **Obligatorio:** sin esta variable nadie puede entrar al panel.
+   - `SCANNER_PIN` — el PIN del escáner de comidas. Sin esta variable el escáner solo acepta el PIN de administrador.
+   - Los PIN **no** están escritos en el código: solo existen en Vercel.
 5. **Redeploy** (Deployments → ⋯ → Redeploy) para que tome las variables.
 6. Comparte con los campistas el enlace `https://tu-proyecto.vercel.app`.
 
