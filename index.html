@@ -428,24 +428,24 @@
             <input type="tel" id="telefono" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="98765432" autocomplete="tel-national" oninput="this.value=this.value.replace(/\D/g,'')" required>
             <p class="small-note">Solo lo usaremos para contactarte si hace falta.</p>
           </div>
-          <div class="field">
+          <div class="field" data-si="emergencia">
             <label for="contactoEmergencia">Contacto de emergencia (nombre)</label>
             <input type="text" id="contactoEmergencia" placeholder="Nombre de un familiar o amigo" required>
           </div>
-          <div class="field">
+          <div class="field" data-si="emergencia">
             <label for="telEmergencia">Número de emergencia (8 dígitos)</label>
             <input type="tel" id="telEmergencia" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="98765432" oninput="this.value=this.value.replace(/\D/g,'')" required>
           </div>
-          <div class="field">
+          <div class="field" data-si="bautizo">
             <label for="bautizado">¿Estás bautizado?</label>
             <select id="bautizado" required><option value="">Selecciona…</option><option value="Sí">Sí</option><option value="No">No</option></select>
           </div>
           <div class="field">
-            <label for="alergiasSel">¿Tienes alergias?</label>
+            <label for="alergiasSel"><span data-si="sinCalculadora">¿Tienes alergias?</span><span data-si="calculadora">¿Alguien de tu familia tiene alergias?</span></label>
             <select id="alergiasSel" required onchange="toggleAlergias()"><option value="">Selecciona…</option><option value="No">No</option><option value="Sí">Sí</option></select>
           </div>
           <div class="field" id="alergiasBox" style="display:none;">
-            <label for="alergiasTxt">¿A qué eres alérgico?</label>
+            <label for="alergiasTxt"><span data-si="sinCalculadora">¿A qué eres alérgico?</span><span data-si="calculadora">¿Quién y a qué es alérgico?</span></label>
             <input type="text" id="alergiasTxt" placeholder="Ej: maní, mariscos, penicilina, picaduras de abeja">
           </div>
           <div class="nav-buttons"><button class="ghost" onclick="goToStep(1)">Atrás</button><button class="primary" onclick="goNext(2)">Siguiente</button></div>
@@ -608,11 +608,11 @@ function goNext(fromStep){
     if(!paymentData){ toast('Sube primero la foto de tu comprobante de depósito.'); return; }
     goToStep(2);
   } else if(fromStep === 2){
-    const req = ['primerNombre','segundoNombre','primerApellido','segundoApellido','anio','mes','dia','telefono','contactoEmergencia','telEmergencia','bautizado','alergiasSel'];
+    const req = ['primerNombre','segundoNombre','primerApellido','segundoApellido','anio','mes','dia','telefono'].concat(PEDIR_EMERGENCIA ? ['contactoEmergencia','telEmergencia'] : [], PEDIR_BAUTIZO ? ['bautizado'] : [], ['alergiasSel']);
     for(const id of req){ const el = document.getElementById(id); if(!el.value){ el.focus(); return; } }
     if(!/^\d{8}$/.test(document.getElementById('telefono').value)){ document.getElementById('telefono').focus(); toast('El teléfono debe tener exactamente 8 dígitos.'); return; }
-    if(!/^\d{8}$/.test(document.getElementById('telEmergencia').value)){ document.getElementById('telEmergencia').focus(); toast('El número de emergencia debe tener exactamente 8 dígitos.'); return; }
-    if(document.getElementById('alergiasSel').value === 'Sí' && !document.getElementById('alergiasTxt').value.trim()){ document.getElementById('alergiasTxt').focus(); toast('Escribe a qué eres alérgico.'); return; }
+    if(PEDIR_EMERGENCIA && !/^\d{8}$/.test(document.getElementById('telEmergencia').value)){ document.getElementById('telEmergencia').focus(); toast('El número de emergencia debe tener exactamente 8 dígitos.'); return; }
+    if(document.getElementById('alergiasSel').value === 'Sí' && !document.getElementById('alergiasTxt').value.trim()){ document.getElementById('alergiasTxt').focus(); toast(CALCULADORA ? 'Escribe quién y a qué es alérgico.' : 'Escribe a qué eres alérgico.'); return; }
     const mes = parseInt(document.getElementById('mes').value);
     const dia = parseInt(document.getElementById('dia').value);
     if(mes < 1 || mes > 12){ alert('El mes debe estar entre 1 y 12.'); return; }

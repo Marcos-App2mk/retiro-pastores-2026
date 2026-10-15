@@ -154,6 +154,7 @@ const MONEDA = EV.moneda || 'L.';
 const PRECIO_TOTAL = Number(EV.precioTotal) || 0, PRECIO_RESERVA = Number(EV.reserva) || 0;
 const PRECIOS = (Array.isArray(EV.precios) && EV.precios.length) ? EV.precios : null;
 const RESERVA_ACTIVA = PRECIO_RESERVA > 0;
+const PEDIR_EMERGENCIA = EV.pedirEmergencia !== false, PEDIR_BAUTIZO = EV.pedirBautizo !== false; // por defecto se piden (como en CIY)
 const SIGLAS = String(EV.siglas || 'EVT').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8) || 'EVT';
 function lempiras(n){ return MONEDA + Number(n||0).toLocaleString('en-US'); }
 function aplicarEvento(sufijoTitulo){
@@ -167,7 +168,7 @@ function aplicarEvento(sufijoTitulo){
     listaPrecios: PRECIOS ? PRECIOS.slice().sort((a,b)=>(Number(b.precio)||0)-(Number(a.precio)||0)).map(p => ((Number(p.precio)||0) === 0 ? 'Gratis' : lempiras(p.precio)) + (p.etiqueta ? ' (' + p.etiqueta + ')' : '')).join(' · ') : ''
   };
   // data-si="reserva precios ..." → el elemento solo se muestra si se cumplen todas las condiciones
-  const cond = { tituloBanner: !!EV.tituloEnBanner, calculadora: !!EV.calculadoraFamilia, sinCalculadora: !EV.calculadoraFamilia, reserva: RESERVA_ACTIVA, sinReserva: !RESERVA_ACTIVA, precios: !!PRECIOS, precioUnico: !PRECIOS, notaPago: !!EV.notaPago };
+  const cond = { emergencia: PEDIR_EMERGENCIA, bautizo: PEDIR_BAUTIZO, tituloBanner: !!EV.tituloEnBanner, calculadora: !!EV.calculadoraFamilia, sinCalculadora: !EV.calculadoraFamilia, reserva: RESERVA_ACTIVA, sinReserva: !RESERVA_ACTIVA, precios: !!PRECIOS, precioUnico: !PRECIOS, notaPago: !!EV.notaPago };
   document.querySelectorAll('[data-si]').forEach(el => { if(!el.getAttribute('data-si').split(/\s+/).every(k => cond[k])) el.style.display = 'none'; });
   document.querySelectorAll('[data-ev]').forEach(el => { const k = el.getAttribute('data-ev'); if(k in textos) el.textContent = textos[k]; });
   document.querySelectorAll('[data-ev-ph]').forEach(el => { const k = el.getAttribute('data-ev-ph'); if(k in textos) el.placeholder = textos[k]; });

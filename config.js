@@ -42,6 +42,10 @@ window.EVENTO = {
   /* ---- Nota bajo las instrucciones de pago (opcional, '' para no mostrarla) ---- */
   notaPago: '',
 
+  /* ---- Preguntas opcionales del formulario ---- */
+  pedirEmergencia: false,            // true = pide contacto y número de emergencia
+  pedirBautizo: false,               // true = pregunta "¿Estás bautizado?"
+
   /* ---- Edad ---- */
   edadAviso: 18,                     // Se marca como "MENOR" a quien tenga menos de esta edad el primer día
 

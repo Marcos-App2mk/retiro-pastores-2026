@@ -562,7 +562,7 @@ function renderAdminList(){
 async function exportSpreadsheet(){
   if(!allRegistrations.length){ toast('No hay registros para exportar todavía.'); return; }
   const mealHeaders = MEALS.map(m => `${m.tipo} D${m.dia}`);
-  const headers = ['#','ID','Nombre completo','Fecha nacimiento','Edad al ' + (EV.fechaInicio || 'inicio'),'Teléfono','Iglesia','Encargado','Contacto de emergencia','Número de emergencia','Bautizado','Alergias','Detalle de alergias','Personas','Familia','Categoría','Costo (L.)','Pago','Monto pagado (L.)','Saldo pendiente (L.)','Estado',
+  const headers = ['#','ID','Nombre completo','Fecha nacimiento','Edad al ' + (EV.fechaInicio || 'inicio'),'Teléfono','Iglesia','Encargado',...(PEDIR_EMERGENCIA ? ['Contacto de emergencia','Número de emergencia'] : []), ...(PEDIR_BAUTIZO ? ['Bautizado'] : []),'Alergias','Detalle de alergias','Personas','Familia','Categoría','Costo (L.)','Pago','Monto pagado (L.)','Saldo pendiente (L.)','Estado',
     'Revisado manualmente',
     'Fecha de registro','Entrada usada','Hora de entrada', ...mealHeaders];
 
@@ -570,7 +570,7 @@ async function exportSpreadsheet(){
     const v = r.verificacionPago || {};
     const base = [
       idx+1, r.id, r.nombreCompleto, r.fechaNacimiento, edadDe(r) === null ? '' : edadDe(r), r.telefono || '', r.iglesia, r.encargado || '',
-      r.contactoEmergencia || '', r.telEmergencia || '', r.bautizado || '', r.tieneAlergias ? 'Sí' : (r.bautizado ? 'No' : ''), r.tieneAlergias ? (r.alergias || '') : '',
+      ...(PEDIR_EMERGENCIA ? [r.contactoEmergencia || '', r.telEmergencia || ''] : []), ...(PEDIR_BAUTIZO ? [r.bautizado || ''] : []), r.tieneAlergias ? 'Sí' : 'No', r.tieneAlergias ? (r.alergias || '') : '',
       personasDe(r), familiaTexto(r), categoriaDe(r), precioDe(r),
       r.estado === 'aprobado' ? (precioDe(r)===0?'Sin costo':r.pago==='completo'?'Pago completo':r.pago==='reserva'?'Reserva':'Sin definir') : '',
       r.estado === 'aprobado' ? pagoInfo(r).pagado : 0,
@@ -767,10 +767,10 @@ function openDatos(id){
       <tr><td>Teléfono</td><td>${esc(r.telefono || '—')}</td></tr>
       <tr><td>Nacimiento</td><td>${esc(r.fechaNacimiento || '—')}${edadDe(r) !== null ? ' (' + edadDe(r) + ' años)' : ''}</td></tr>
       <tr><td>Iglesia</td><td>${esc(r.iglesia || '—')}</td></tr>
-      <tr><td>Líder / pastor</td><td>${esc(r.encargado || '—')}</td></tr>
-      <tr><td>Contacto de emergencia</td><td>${esc(r.contactoEmergencia || '—')}</td></tr>
-      <tr><td>Número de emergencia</td><td>${esc(r.telEmergencia || '—')}</td></tr>
-      <tr><td>Bautizado</td><td>${esc(r.bautizado || '—')}</td></tr>
+      ${CALCULADORA && !r.encargado ? '' : `<tr><td>Líder / pastor</td><td>${esc(r.encargado || '—')}</td></tr>`}
+      ${PEDIR_EMERGENCIA ? `<tr><td>Contacto de emergencia</td><td>${esc(r.contactoEmergencia || '—')}</td></tr>
+      <tr><td>Número de emergencia</td><td>${esc(r.telEmergencia || '—')}</td></tr>` : ''}
+      ${PEDIR_BAUTIZO ? `<tr><td>Bautizado</td><td>${esc(r.bautizado || '—')}</td></tr>` : ''}
       <tr><td>Registrado</td><td>${r.creado ? new Date(r.creado).toLocaleString() : '—'}</td></tr>
     </table>
     <div class="datos-qr">
@@ -828,9 +828,9 @@ function openEdit(id){
     <label>Teléfono</label><input type="text" id="edTelefono" inputmode="numeric" maxlength="8" value="${esc(r.telefono||'')}">
     <label>Iglesia</label><input type="text" id="edIglesia" value="${esc(r.iglesia)}">
     <label>Encargado</label><input type="text" id="edEncargado" value="${esc(r.encargado||'')}">
-    <label>Contacto de emergencia</label><input type="text" id="edContacto" value="${esc(r.contactoEmergencia||'')}">
-    <label>Número de emergencia</label><input type="text" id="edTelEmerg" inputmode="numeric" maxlength="8" value="${esc(r.telEmergencia||'')}">
-    <label>Bautizado</label><select id="edBautizado"><option value=""${!r.bautizado?' selected':''}>—</option><option value="Sí"${r.bautizado==='Sí'?' selected':''}>Sí</option><option value="No"${r.bautizado==='No'?' selected':''}>No</option></select>
+    ${PEDIR_EMERGENCIA ? `    <label>Contacto de emergencia</label><input type="text" id="edContacto" value="${esc(r.contactoEmergencia||'')}">
+    <label>Número de emergencia</label><input type="text" id="edTelEmerg" inputmode="numeric" maxlength="8" value="${esc(r.telEmergencia||'')}">` : ''}
+    ${PEDIR_BAUTIZO ? `    <label>Bautizado</label><select id="edBautizado"><option value=""${!r.bautizado?' selected':''}>—</option><option value="Sí"${r.bautizado==='Sí'?' selected':''}>Sí</option><option value="No"${r.bautizado==='No'?' selected':''}>No</option></select>` : ''}
     <label>Alergias (déjalo vacío si no tiene)</label><input type="text" id="edAlergias" value="${esc(r.tieneAlergias ? (r.alergias||'') : '')}">
     <div class="row-actions" style="margin-top:14px;">
       <button class="primary small" onclick="saveEdit('${r.id}')">Guardar cambios</button>
@@ -850,9 +850,11 @@ async function saveEdit(id){
     record.nombreCompleto = nombre; record.fechaNacimiento = fecha; record.iglesia = iglesia;
     record.telefono = (document.getElementById('edTelefono').value || '').replace(/\D/g,'');
     record.encargado = document.getElementById('edEncargado').value.trim();
-    record.contactoEmergencia = document.getElementById('edContacto').value.trim();
-    record.telEmergencia = (document.getElementById('edTelEmerg').value || '').replace(/\D/g,'');
-    record.bautizado = document.getElementById('edBautizado').value;
+    if(PEDIR_EMERGENCIA){
+      record.contactoEmergencia = document.getElementById('edContacto').value.trim();
+      record.telEmergencia = (document.getElementById('edTelEmerg').value || '').replace(/\D/g,'');
+    }
+    if(PEDIR_BAUTIZO) record.bautizado = document.getElementById('edBautizado').value;
     record.alergias = document.getElementById('edAlergias').value.trim();
     record.tieneAlergias = !!record.alergias;
     record.editadoAdmin = new Date().toISOString();
