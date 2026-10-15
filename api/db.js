@@ -6,7 +6,10 @@ const ADMIN_PIN = String(process.env.ADMIN_PIN || '').trim();
 const SCANNER_PIN = String(process.env.SCANNER_PIN || '').trim();
 // Si usas la misma base de datos para varios eventos, pon una variable EVENT_ID distinta en cada proyecto de Vercel
 // (por ejemplo: ciy2027, retiro2027). Cada evento queda separado. Si no la pones, funciona como siempre.
-const NS = process.env.EVENT_ID ? String(process.env.EVENT_ID).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40) + ':' : '';
+// Este evento SIEMPRE usa su propio espacio en la base ('retiro2026'), aunque la base sea compartida con CIY.
+// La variable EVENT_ID de Vercel, si existe, lo reemplaza.
+const EVENT_ID_DEFAULT = 'retiro2026';
+const NS = String(process.env.EVENT_ID || EVENT_ID_DEFAULT).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40) + ':';
 const MAX_COMIDAS = 40;
 const ID_RE = /^[A-Z0-9]{2,8}-[A-Z0-9]{6}$/;
 const COLLECTIONS = ['registrations', 'receipts'];
