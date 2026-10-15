@@ -164,7 +164,7 @@ function aplicarEvento(sufijoTitulo){
     precioTotal: lempiras(PRECIO_TOTAL), reserva: lempiras(PRECIO_RESERVA), saldoReserva: lempiras(PRECIO_TOTAL - PRECIO_RESERVA),
     banco: (EV.banco && EV.banco.nombre) || '', nroComidas: String(MEALS.length), edadAviso: String(EV.edadAviso || 12),
     ejemploCodigo: SIGLAS + '-XXXXXX', precioAdulto: lempiras(PRECIOS ? Math.max.apply(null, PRECIOS.map(p=>Number(p.precio)||0)) : PRECIO_TOTAL), notaPago: EV.notaPago || '',
-    listaPrecios: PRECIOS ? PRECIOS.map(p => ((Number(p.precio)||0) === 0 ? 'Gratis' : lempiras(p.precio)) + (p.etiqueta ? ' (' + p.etiqueta + ')' : '')).join(' · ') : ''
+    listaPrecios: PRECIOS ? PRECIOS.slice().sort((a,b)=>(Number(b.precio)||0)-(Number(a.precio)||0)).map(p => ((Number(p.precio)||0) === 0 ? 'Gratis' : lempiras(p.precio)) + (p.etiqueta ? ' (' + p.etiqueta + ')' : '')).join(' · ') : ''
   };
   // data-si="reserva precios ..." → el elemento solo se muestra si se cumplen todas las condiciones
   const cond = { tituloBanner: !!EV.tituloEnBanner, calculadora: !!EV.calculadoraFamilia, sinCalculadora: !EV.calculadoraFamilia, reserva: RESERVA_ACTIVA, sinReserva: !RESERVA_ACTIVA, precios: !!PRECIOS, precioUnico: !PRECIOS, notaPago: !!EV.notaPago };
@@ -178,7 +178,7 @@ function aplicarEvento(sufijoTitulo){
   if(EV.colorAcentoOscuro) r.style.setProperty('--ember-dark', EV.colorAcentoOscuro);
   document.title = (EV.nombre || 'Evento') + (sufijoTitulo ? ' — ' + sufijoTitulo : '');
 }
-const ADMIN_PIN = '123789';
+const ADMIN_PIN = '961271';
 
 /* ---------- Código QR del participante e imagen para guardar o compartir ---------- */
 function qrPayload(registro){
