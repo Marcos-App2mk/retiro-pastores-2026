@@ -1,6 +1,6 @@
 const { cmd } = require('./_kv');
 
-const ADMIN_PIN = process.env.ADMIN_PIN || '123789';
+const ADMIN_PIN = process.env.ADMIN_PIN || '961271';
 const SCANNER_PIN = process.env.SCANNER_PIN || '2121';
 // Si usas la misma base de datos para varios eventos, pon una variable EVENT_ID distinta en cada proyecto de Vercel
 // (por ejemplo: ciy2027, retiro2027). Cada evento queda separado. Si no la pones, funciona como siempre.
