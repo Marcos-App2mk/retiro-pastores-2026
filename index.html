@@ -454,7 +454,7 @@
         <section class="step" id="step3">
           <h2>Información de tu iglesia</h2>
           <p class="hint">Nos ayuda a organizar los grupos por congregación.</p>
-          <div class="field"><label for="iglesia">Nombre de la iglesia</label><input type="text" id="iglesia" required></div>
+          <div class="field"><label for="iglesia">Nombre o local de la iglesia</label><input type="text" id="iglesia" required></div>
           <div class="field" data-si="sinCalculadora"><label for="encargado">Pastor o líder de jóvenes <span style="font-weight:400;">(opcional)</span></label><input type="text" id="encargado"></div>
           <div class="nav-buttons"><button class="ghost" onclick="goToStep(2)">Atrás</button><button class="primary" id="submitBtn" onclick="enviarDesdePaso3()">Enviar registro</button></div>
         </section>
@@ -489,35 +489,49 @@ let paymentData = null;
 let familiaCalc = null;   // resultado de la calculadora (si está activa)
 
 /* ---------- Calculadora de costo por familia ---------- */
+/* Fecha de 3 casillas (año, mes, día) → 'AAAA/MM/DD'; '' si está incompleta o no existe (ej. 31 de febrero) */
+function fechaDeCasillas(a, m, d){
+  a = parseInt(a); m = parseInt(m); d = parseInt(d);
+  if(!a || !m || !d || a < 1900 || a > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return '';
+  const f = new Date(a, m-1, d); if(f.getMonth() !== m-1 || f.getDate() !== d) return '';
+  if(f > FECHA_CAMPAMENTO) return '';
+  return `${a}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
+}
 function fechaDeInput(v){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? `${m[1]}/${m[2]}/${m[3]}` : ''; }
 function calcHijos(){
   const box = document.getElementById('calcHijosBox');
   const n = parseInt(document.getElementById('calcNumHijos').value) || 0;
-  const prev = [...box.querySelectorAll('.hijo-box')].map(b => ({ n: b.querySelector('.h-nombre').value, f: b.querySelector('.h-fecha').value }));
+  const prev = [...box.querySelectorAll('.hijo-box')].map(b => ({ n: b.querySelector('.h-nombre').value, a: b.querySelector('.h-anio').value, m: b.querySelector('.h-mes').value, d: b.querySelector('.h-dia').value }));
   let html = '';
   for(let i = 0; i < n; i++){
     html += `<div class="hijo-box">
       <h4>Hijo/a ${i+1}</h4>
-      <div class="row2">
-        <div class="field"><label for="hN${i}">Primer nombre</label><input type="text" id="hN${i}" class="h-nombre" oninput="calcActualizar()"></div>
-        <div class="field"><label for="hF${i}">Fecha de nacimiento</label><input type="date" id="hF${i}" class="h-fecha" max="${esc(EV.fechaInicio || '')}" min="1990-01-01" onchange="calcActualizar()" oninput="calcActualizar()"></div>
+      <div class="field"><label for="hN${i}">Primer nombre</label><input type="text" id="hN${i}" class="h-nombre" oninput="calcActualizar()"></div>
+      <div class="field">
+        <label for="hA${i}">Fecha de nacimiento (Año/Mes/Día)</label>
+        <div class="row3">
+          <input type="number" id="hA${i}" class="h-anio" placeholder="Año" min="1990" max="2100" inputmode="numeric" oninput="calcActualizar()">
+          <input type="number" id="hM${i}" class="h-mes" placeholder="Mes" min="1" max="12" inputmode="numeric" oninput="calcActualizar()">
+          <input type="number" id="hD${i}" class="h-dia" placeholder="Día" min="1" max="31" inputmode="numeric" oninput="calcActualizar()">
+        </div>
+        <p class="small-note">Ejemplo: 2015/08/05</p>
       </div>
       <div class="edad-note" id="hE${i}"></div>
     </div>`;
   }
   box.innerHTML = html;
-  prev.slice(0, n).forEach((p, i) => { document.getElementById('hN'+i).value = p.n; document.getElementById('hF'+i).value = p.f; });
+  prev.slice(0, n).forEach((p, i) => { document.getElementById('hN'+i).value = p.n; document.getElementById('hA'+i).value = p.a; document.getElementById('hM'+i).value = p.m; document.getElementById('hD'+i).value = p.d; });
   calcActualizar();
 }
 function calcLeer(){
-  const hijos = [...document.querySelectorAll('#calcHijosBox .hijo-box')].map(b => ({ nombre: b.querySelector('.h-nombre').value.trim(), fechaNacimiento: fechaDeInput(b.querySelector('.h-fecha').value) }));
+  const hijos = [...document.querySelectorAll('#calcHijosBox .hijo-box')].map(b => ({ nombre: b.querySelector('.h-nombre').value.trim(), fechaNacimiento: fechaDeCasillas(b.querySelector('.h-anio').value, b.querySelector('.h-mes').value, b.querySelector('.h-dia').value), _incompleta: !b.querySelector('.h-anio').value || !b.querySelector('.h-mes').value || !b.querySelector('.h-dia').value }));
   return { pastor: document.getElementById('calcPastor').value.trim(), esposa: document.getElementById('calcEsposa').value.trim(), hijos };
 }
 function calcActualizar(){
   const f = calcLeer();
   f.hijos.forEach((h, i) => {
     const e = edadDe(h), el = document.getElementById('hE'+i); if(!el) return;
-    if(!h.fechaNacimiento){ el.textContent = ''; return; }
+    if(!h.fechaNacimiento){ el.textContent = h._incompleta ? '' : 'Revisa la fecha de nacimiento.'; return; }
     if(e === null){ el.textContent = 'Revisa la fecha de nacimiento.'; return; }
     const p = precioPorEdad(e);
     el.textContent = `Tendrá ${e} ${e === 1 ? 'año' : 'años'} al iniciar el retiro · ${p === 0 ? 'Gratis' : lempiras(p)}${e >= 18 ? ' (precio de adulto)' : ''}`;
@@ -540,7 +554,7 @@ function calcValidar(r){
   if(document.getElementById('calcNumHijos').value === ''){ document.getElementById('calcNumHijos').focus(); toast('Indica cuántos hijos asistirán (o "Ninguno").'); return false; }
   for(let i = 0; i < f.hijos.length; i++){
     if(!f.hijos[i].nombre){ document.getElementById('hN'+i).focus(); toast('Escribe el nombre del hijo/a ' + (i+1) + '.'); return false; }
-    if(edadDe(f.hijos[i]) === null){ document.getElementById('hF'+i).focus(); toast('Revisa la fecha de nacimiento del hijo/a ' + (i+1) + '.'); return false; }
+    if(edadDe(f.hijos[i]) === null){ document.getElementById('hA'+i).focus(); toast('Revisa la fecha de nacimiento del hijo/a ' + (i+1) + '.'); return false; }
   }
   return true;
 }
@@ -623,7 +637,7 @@ function goNext(fromStep){
 
 function enviarDesdePaso3(){
   const iglesia = document.getElementById('iglesia');
-  if(!iglesia.value.trim()){ iglesia.focus(); toast('Escribe el nombre de tu iglesia.'); return; }
+  if(!iglesia.value.trim()){ iglesia.focus(); toast('Escribe el nombre o local de tu iglesia.'); return; }
   enviarRegistro();
 }
 
@@ -717,7 +731,8 @@ async function enviarRegistro(){
     creado: new Date().toISOString()
   };
   if(CALCULADORA && familiaCalc){
-    registro.familia = familiaCalc.familia;
+    const fc = familiaCalc.familia;
+    registro.familia = { pastor: fc.pastor, esposa: fc.esposa, hijos: fc.hijos.map(h => ({ nombre: h.nombre, fechaNacimiento: h.fechaNacimiento })) };
     registro.costoFamilia = familiaCalc.total;
     registro.depositoRequerido = familiaCalc.deposito;
   }
