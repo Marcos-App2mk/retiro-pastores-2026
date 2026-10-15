@@ -1,0 +1,15 @@
+{
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/comidas",
+      "destination": "/scanner",
+      "permanent": true
+    },
+    {
+      "source": "/comidas.html",
+      "destination": "/scanner",
+      "permanent": true
+    }
+  ]
+}

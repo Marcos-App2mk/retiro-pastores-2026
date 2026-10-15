@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Retiro de Pastores — Administración</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Karla:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+/* Lector de QR (jsQR): se prueba en varios servidores por si uno falla */
+window.jsqrReady = new Promise(function(resolve){
+  if(window.jsQR) return resolve(true);
+  var urls = ['https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js','https://unpkg.com/jsqr@1.4.0/dist/jsQR.js','https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js'];
+  (function next(i){
+    if(window.jsQR) return resolve(true);
+    if(i >= urls.length) return resolve(false);
+    var s = document.createElement('script'); s.src = urls[i];
+    s.onload = function(){ window.jsQR ? resolve(true) : next(i+1); };
+    s.onerror = function(){ next(i+1); };
+    document.head.appendChild(s);
+  })(0);
+});
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root{
+    --pine:#1E4A32;
+    --pine-dark:#11301F;
+    --moss:#3D7354;
+    --parchment:#0C2117;
+    --cream:#F7FAF4;
+    --ember:#2B7A4B;
+    --ember-dark:#1F5C38;
+    --wood:#3F5E4B;
+    --gold:#E8B23D;
+    --ink:#26231C;
+    --line:#CFDDCF;
+    --bad:#B23A32;
+    --ok:#2B7A4B;
+    --warn:#C68A1F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:'Karla',sans-serif;
+    line-height:1.5;
+  }
+  h1,h2,h3{
+    font-family:'Archivo Black',sans-serif;
+    font-weight:400;
+    letter-spacing:0.3px;
+    margin:0;
+  }
+  .app{ max-width:640px; margin:0 auto; padding:0 0 48px; }
+
+  header.topo{
+    background:
+      none center / 100% 100% no-repeat;
+    color:var(--cream);
+    padding:0;
+    aspect-ratio:1535/842;
+    position:relative;
+    overflow:hidden;
+    text-align:center;
+  }
+  header.topo svg.ridge{ display:none; }
+  .reflection-pool{
+    position:relative;
+    height:150px;
+    overflow:hidden;
+    background:var(--parchment);
+    padding:0 28px;
+  }
+  .reflection-pool::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image:none;
+    background-size:cover;
+    background-position:center bottom;
+    transform:scaleY(-1);
+    opacity:0.42;
+    filter:brightness(0.85) saturate(0.9);
+    -webkit-mask-image:linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0) 88%);
+    mask-image:linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0) 88%);
+  }
+  .reflection-pool svg.ridge{ display:block; position:absolute; bottom:-1px; left:0; width:100%; height:30px; fill:var(--parchment); z-index:2; }
+  .reflection-pool .sub-reflect{
+    position:relative; z-index:3;
+    margin:0; padding-top:22px;
+    text-align:center;
+    color:var(--cream);
+    font-size:15px;
+    max-width:42ch;
+    margin-left:auto; margin-right:auto;
+    text-shadow:0 2px 6px rgba(0,0,0,0.8);
+  }
+  .corner-badge{
+    position:absolute; top:16px; right:16px; z-index:3;
+    background:#EAE7DC; border-radius:12px; padding:9px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.35);
+  }
+  .corner-badge img{ width:52px; height:52px; display:block; }
+  /* Logo del retiro: abajo a la izquierda, más pequeño (logo horizontal) */
+  .corner-badge{ top:auto; right:auto; bottom:12px; left:12px; padding:5px 7px; border-radius:8px; background:#fff; }
+  .corner-badge img{ width:auto; height:26px; }
+  .brand-center{ position:relative; z-index:2; }
+  .brand-center .logo-img{
+    width:88px; height:88px; display:block; margin:0 auto 12px;
+    filter:drop-shadow(0 6px 14px rgba(0,0,0,0.6));
+  }
+  .brand-center .kicker{ color:var(--gold); font-size:13px; margin:0 0 2px; letter-spacing:0.5px; text-shadow:0 2px 8px rgba(0,0,0,0.6); }
+  .brand-center h1{ font-size:32px; line-height:1.1; letter-spacing:1px; text-shadow:0 2px 10px rgba(0,0,0,0.7); }
+  header.topo p.sub{ margin:14px auto 0; max-width:42ch; color:#EDEBDD; font-size:15px; position:relative; z-index:2; text-shadow:0 2px 8px rgba(0,0,0,0.7); }
+
+  .mode-tabs{
+    display:flex; gap:8px; padding:16px 22px 0;
+  }
+  .mode-tabs button{
+    flex:1; padding:10px 6px; border-radius:5px; border:1.5px solid var(--line);
+    background:var(--cream); color:var(--wood); font-weight:700; font-size:13px;
+  }
+  .mode-tabs button.active{ background:var(--pine); color:#fff; border-color:var(--pine); }
+
+  .trail{ display:flex; justify-content:space-between; padding:0 28px; margin:18px 0 22px; }
+  .trail .marker{ flex:1; text-align:center; position:relative; }
+  .trail .marker::before{
+    content:attr(data-n); display:flex; align-items:center; justify-content:center;
+    width:32px; height:32px; margin:0 auto 6px; border-radius:50%;
+    background:var(--cream); border:2px solid var(--line); color:var(--wood);
+    font-family:'Archivo Black',sans-serif; font-size:14px; transition:all .2s ease;
+  }
+  .trail .marker.active::before{ background:var(--ember); border-color:var(--ember-dark); color:#fff; }
+  .trail .marker.done::before{ content:"✓"; background:var(--moss); border-color:var(--moss); color:#fff; }
+  .trail .marker span{ font-size:12px; color:#D8CBB8; }
+  .trail .marker.active span{ color:var(--gold); font-weight:700; }
+  .trail .marker.done span{ color:#B9C9BB; }
+
+  main{ padding:0 22px; }
+  .card{ background:var(--cream); border:1px solid var(--line); border-radius:6px; padding:26px 24px; }
+
+  #formCard{ position:relative; overflow:hidden; }
+  #formCard::before{
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:210px;
+    background-image:none;
+    background-size:cover;
+    background-position:center 32%;
+    transform:scaleY(-1);
+    opacity:0.16;
+    filter:sepia(25%) brightness(0.85);
+    -webkit-mask-image:linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0) 88%);
+    mask-image:linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0) 88%);
+    pointer-events:none;
+    z-index:0;
+  }
+  #formCard > .step{ position:relative; z-index:1; }
+
+  .view{ display:none; }
+  .view.active{ display:block; }
+  .step{ display:none; }
+  .step.active{ display:block; }
+
+  .step h2, .panel h2{ font-size:20px; color:var(--pine-dark); margin-bottom:4px; }
+  .step p.hint, .panel p.hint{ margin:0 0 22px; color:var(--wood); font-size:14px; }
+
+  label{ display:block; font-size:13px; color:var(--wood); margin-bottom:5px; font-weight:700; }
+  .field{ margin-bottom:18px; }
+  input[type=text], input[type=number], input[type=password], select{
+    width:100%; padding:11px 12px; border:1.5px solid var(--line); border-radius:4px;
+    background:#fff; font-family:'Karla',sans-serif; font-size:15px; color:var(--ink);
+  }
+  input:focus, select:focus, button:focus-visible{ outline:3px solid var(--gold); outline-offset:1px; border-color:var(--wood); }
+  .row3{ display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:10px; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .small-note{ font-size:12px; color:var(--wood); margin-top:6px; }
+
+  .nav-buttons{ display:flex; justify-content:space-between; margin-top:26px; gap:12px; }
+  button{ font-family:'Karla',sans-serif; font-weight:700; font-size:15px; border-radius:4px; padding:12px 20px; border:none; cursor:pointer; transition:transform .08s ease, background .15s ease; }
+  button:active{ transform:translateY(1px); }
+  button.primary{ background:var(--ember); color:#fff; }
+  button.primary:hover{ background:var(--ember-dark); }
+  button.primary:disabled{ background:#CBBFA0; color:#8a8067; cursor:not-allowed; }
+  button.ghost{ background:transparent; color:var(--wood); border:1.5px solid var(--line); }
+  button.ghost:hover{ border-color:var(--wood); }
+  button.small{ padding:8px 12px; font-size:13px; }
+
+  .upload-box{ border:2px dashed var(--line); border-radius:6px; padding:22px; text-align:center; background:#fffef9; cursor:pointer; }
+  .upload-box:hover{ border-color:var(--ember); }
+  .upload-box img{ max-width:100%; max-height:220px; border-radius:4px; margin-top:12px; }
+  .upload-box .placeholder{ color:var(--wood); font-size:14px; }
+  input[type=file]{ display:none; }
+
+  .verify-row{ display:flex; gap:12px; align-items:center; margin-top:14px; flex-wrap:wrap; }
+  .result-box{ margin-top:16px; padding:14px 16px; border-radius:5px; font-size:14px; display:none; }
+  .result-box.ok{ background:#E6F0E6; border:1px solid var(--moss); color:#254a30; display:block; }
+  .result-box.fail{ background:#F8E3DC; border:1px solid var(--ember); color:#7A2E17; display:block; }
+  .result-box.working{ background:#FBF3DD; border:1px solid var(--gold); color:#6a4f10; display:block; }
+  .result-box strong{ display:block; margin-bottom:4px; }
+
+  #step4 .card, #pendingCard{ background:transparent; border:none; padding:0; }
+  #misDetail{ margin-top:20px; }
+  #misDetail:empty{ margin-top:0; }
+  .confirm-head{ text-align:center; margin-bottom:24px; }
+  .confirm-head h2{ color:var(--pine-dark); font-size:22px; }
+  .confirm-head p{ color:var(--wood); font-size:14px; margin-top:6px; }
+
+  .ticket{ background:var(--cream); border:1px solid var(--line); border-radius:6px; padding:20px; display:flex; align-items:center; gap:18px; margin-bottom:22px; position:relative; }
+  .ticket.entrada{ border-left:6px solid var(--ember); }
+  .ticket .qr-holder{ flex:0 0 auto; background:#fff; padding:8px; border-radius:4px; border:1px solid var(--line); }
+  .ticket .info h3{ font-size:16px; color:var(--pine-dark); margin-bottom:4px; }
+  .ticket .info p{ margin:2px 0; font-size:13px; color:var(--wood); }
+  .ticket .info .id-code{ font-family:monospace; font-size:12px; background:#F0E9D2; padding:2px 6px; border-radius:3px; }
+
+  .meals-title{ font-size:16px; color:var(--pine-dark); margin:22px 0 12px; }
+  .meals-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .stub{ background:var(--cream); border:1.5px dashed var(--wood); border-radius:6px; padding:12px 10px; text-align:center; position:relative; }
+  .stub .qr-holder{ background:#fff; display:inline-block; padding:5px; border-radius:3px; }
+  .stub .meal-name{ font-weight:700; font-size:13px; margin-top:8px; color:var(--ink); }
+  .stub .day-name{ font-size:11px; color:var(--wood); }
+  .save-photo-box{ background:#FBF0DA; border:2px solid var(--gold); border-radius:8px; padding:14px 16px; margin:18px 0 0; text-align:center; }
+  .save-photo-box strong{ display:block; font-size:16px; color:var(--ink); margin-bottom:4px; }
+  .save-photo-box p{ margin:0 0 10px; font-size:13px; color:var(--wood); }
+  .photo-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.88); z-index:90; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:16px; overflow:auto; }
+  .photo-overlay img{ max-width:100%; max-height:70vh; border-radius:6px; }
+  .photo-overlay p{ color:#fff; text-align:center; margin:0; max-width:34ch; }
+  .confirm-actions{ display:flex; gap:12px; justify-content:center; margin-top:26px; flex-wrap:wrap; }
+
+  .pending-box{ text-align:center; padding:30px 20px; }
+  .pending-box .id-big{ font-family:monospace; font-size:20px; background:#F0E9D2; padding:10px 16px; border-radius:5px; display:inline-block; margin:14px 0; letter-spacing:1px; }
+
+  footer.foot{
+    text-align:center; color:var(--ink); font-size:16px; font-weight:700; line-height:1.45;
+    margin:22px 22px 0; padding:16px 18px; background:#FBF0DA; border:1.5px solid var(--gold);
+    border-radius:8px;
+  }
+  footer.foot strong{ color:var(--ember-dark); }
+  footer.foot .foot-sub{ display:block; font-size:13px; font-weight:500; color:var(--wood); margin-top:4px; }
+
+  /* Admin */
+  .pin-wrap{ text-align:center; padding:20px 10px 6px; }
+  .pin-dots{ display:flex; justify-content:center; gap:12px; margin:18px 0 22px; }
+  .pin-dots span{ width:16px; height:16px; border-radius:50%; border:2px solid var(--wood); display:inline-block; }
+  .pin-dots span.filled{ background:var(--ember); border-color:var(--ember-dark); }
+  .pin-dots.shake{ animation:shake .3s; }
+  @keyframes shake{ 0%,100%{transform:translateX(0);} 25%{transform:translateX(-8px);} 75%{transform:translateX(8px);} }
+  .keypad{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; max-width:280px; margin:0 auto; }
+  .keypad button{ background:#fff; border:1.5px solid var(--line); color:var(--ink); font-size:20px; padding:16px 0; border-radius:6px; }
+  .keypad button:hover{ border-color:var(--ember); }
+  .pin-error{ color:var(--bad); font-size:13px; height:18px; margin-bottom:6px; }
+
+  .admin-summary{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:18px; }
+  @media (max-width:520px){ .admin-summary{ grid-template-columns:repeat(2,1fr); } }
+  .stat{ min-width:0; background:var(--cream); border:1px solid var(--line); border-radius:6px; padding:10px 12px; text-align:center; }
+  button.stat{ font:inherit; cursor:pointer; color:inherit; }
+  .stat.active{ border-color:var(--ember); box-shadow:0 0 0 2px var(--ember); background:#FBF0DA; }
+  .stat b{ display:block; font-size:20px; font-family:'Archivo Black',sans-serif; color:var(--pine-dark); }
+  .stat span{ font-size:11px; color:var(--wood); }
+
+  .admin-toolbar{ display:flex; gap:10px; margin-bottom:16px; flex-wrap:wrap; }
+  .admin-toolbar input[type=text]{ flex:1; min-width:140px; }
+
+  .pay-banner{ border-radius:8px; padding:12px 14px; margin:10px 0 6px; font-weight:800; font-size:15px; color:#fff; }
+  .pay-banner.completo{ background:#1F7A3A; } .pay-banner.reserva, .pay-banner.sin{ background:#B8741A; }
+  .pay-tag{ display:inline-block; border-radius:10px; padding:2px 8px; font-size:11px; font-weight:800; margin-left:6px; vertical-align:middle; color:#fff; }
+  .pay-tag.completo{ background:#1F7A3A; } .pay-tag.reserva, .pay-tag.sin{ background:#B8741A; }
+  .allergy-alert{ background:#B0301F; color:#fff; border-radius:8px; padding:12px 14px; margin:10px 0; font-size:15px; font-weight:700; letter-spacing:.3px; }
+  .allergy-alert b{ font-size:18px; display:block; margin-top:2px; }
+  .age-alert{ background:#5B3A9E; color:#fff; border-radius:8px; padding:12px 14px; margin:10px 0; font-size:15px; font-weight:700; letter-spacing:.3px; }
+  .age-alert b{ font-size:18px; display:block; margin-top:2px; }
+  .age-tag{ display:inline-block; background:#5B3A9E; color:#fff; border-radius:10px; padding:2px 8px; font-size:11px; font-weight:800; margin-left:6px; vertical-align:middle; }
+  .allergy-tag{ display:inline-block; background:#B0301F; color:#fff; border-radius:10px; padding:2px 8px; font-size:11px; font-weight:800; margin-left:6px; vertical-align:middle; }
+  .camper-row.clickable{ cursor:pointer; }
+  .camper-row.clickable:active{ background:#F3EBD3; }
+  .row-open{ margin-top:8px; font-size:13px; font-weight:700; color:var(--ember); }
+  .modal-box .qr-frame img, .modal-box .qr-frame canvas{ width:140px !important; height:140px !important; margin:0 !important; border:none !important; border-radius:0 !important; }
+  .modal-box .receipt-box img{ max-height:340px; object-fit:contain; background:#fff; }
+  .detail-sec{ margin:16px 0 6px; font-size:13px; font-weight:800; color:var(--pine-dark); text-transform:uppercase; letter-spacing:.5px; }
+  .btn-row{ display:flex; gap:8px; margin:8px 0; }
+  .btn-row button{ flex:1; padding:12px 6px; font-size:14px; }
+  .camper-row{ background:var(--cream); border:1px solid var(--line); border-radius:6px; padding:14px 16px; margin-bottom:12px; }
+  .camper-row .top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .camper-row h3{ font-size:15px; color:var(--pine-dark); margin-bottom:2px; }
+  .camper-row p{ margin:2px 0; font-size:13px; color:var(--wood); }
+  .badge{ font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap; }
+  .badge.aprobado{ background:#E6F0E6; color:var(--ok); }
+  .badge.pendiente{ background:#FBF0DA; color:var(--warn); }
+  .badge.rechazado{ background:#F8E3DC; color:var(--bad); }
+  .camper-row .thumb{ width:54px; height:54px; object-fit:cover; border-radius:4px; border:1px solid var(--line); cursor:pointer; }
+  .camper-row .row-actions{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .camper-row .row-actions button{ flex:1; min-width:90px; }
+  .tick-status{ font-size:12px; color:var(--wood); margin-top:6px; }
+
+  .modal-overlay{ position:fixed; inset:0; background:rgba(21,42,32,0.82); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal-overlay.active{ display:flex; }
+  .modal-box{ background:var(--cream); border-radius:8px; padding:20px; max-width:440px; width:100%; max-height:88vh; overflow:auto; }
+  .modal-box img{ width:100%; border-radius:5px; margin:12px 0; border:1px solid var(--line); }
+  .modal-box .ai-note{ font-size:13px; background:#F0EADA; padding:10px 12px; border-radius:5px; margin-bottom:10px; }
+  .modal-close{ display:flex; justify-content:flex-end; }
+
+  .scanner-panel{ text-align:center; }
+  .scanner-panel video{ width:100%; max-width:360px; border-radius:8px; background:#000; }
+  .scan-status{ margin:16px auto; padding:14px; border-radius:6px; font-weight:700; font-size:15px; max-width:360px; }
+  .scan-status.idle{ background:#F0EADA; color:var(--wood); }
+  .scan-status.ok{ background:#E6F0E6; color:var(--ok); }
+  .scan-status.fail{ background:#F8E3DC; color:var(--bad); }
+  .scan-status.warn{ background:#FBF0DA; color:var(--warn); }
+  .scan-log{ text-align:left; max-width:360px; margin:0 auto; font-size:12px; color:var(--wood); max-height:140px; overflow:auto; }
+  .scan-log div{ padding:4px 0; border-bottom:1px solid var(--line); }
+
+  @media (max-width:480px){
+    .row3{ grid-template-columns:1fr 1fr 1fr; }
+    .meals-grid{ grid-template-columns:repeat(2,1fr); }
+    header.topo h1{ font-size:24px; }
+  }
+  @media print{
+    header.topo, .trail, .mode-tabs, .confirm-head, .confirm-actions, footer.foot{ display:none !important; }
+    body{ background:#fff; }
+    .ticket, .stub{ break-inside:avoid; }
+  }
+
+  header.topo.admin-head{ background:linear-gradient(rgba(12,33,23,.72),rgba(12,33,23,.88)), var(--theme-img) center 40% / cover no-repeat; aspect-ratio:auto; min-height:0; padding:26px 16px 22px; }
+  header.topo.admin-head h1{ color:var(--gold); font-size:26px; margin:0; }
+  header.topo.admin-head p{ margin:4px 0 0; color:var(--cream); font-size:15px; }
+  .admin-nav{ padding:14px 22px 0; }
+  .admin-nav a{ color:var(--gold); font-weight:700; text-decoration:none; }
+
+  .meal-counter{ font-weight:700; font-size:14px; color:var(--pine-dark); background:#E6F0E6; border-radius:6px; padding:8px 12px; margin-bottom:10px; text-align:center; }
+  details.tally{ background:var(--cream); border:1px solid var(--line); border-radius:6px; margin-bottom:18px; }
+  details.tally > summary{ cursor:pointer; padding:12px 14px; font-weight:700; color:var(--pine-dark); }
+  details.tally > summary small{ font-weight:400; color:var(--wood); }
+  .tally-body{ padding:0 14px 14px; overflow-x:auto; }
+  .tally-table{ width:100%; border-collapse:collapse; font-size:13px; margin:6px 0 12px; }
+  .tally-table th{ text-align:left; font-size:11px; letter-spacing:.5px; text-transform:uppercase; color:var(--wood); padding:6px 8px; border-bottom:2px solid var(--line); }
+  .tally-table td{ padding:7px 8px; border-bottom:1px solid var(--line); }
+  .tally-table td.n, .tally-table th.n{ text-align:right; font-variant-numeric:tabular-nums; }
+  .tally-table tr.total td{ font-weight:800; border-top:2px solid var(--pine-dark); border-bottom:none; background:#F0E9D2; }
+  .tally-h{ font-size:13px; color:var(--pine-dark); margin:12px 0 0; font-family:'Karla',sans-serif; font-weight:800; }
+  .meal-chips{ display:flex; flex-wrap:wrap; gap:4px; margin:6px 0 2px; }
+  .meal-chips span{ font-size:11px; padding:3px 8px; border-radius:12px; background:#EDE7D6; color:var(--wood); }
+  .meal-chips span.used{ background:#E6F0E6; color:var(--ok); font-weight:700; }
+  table.datos{ width:100%; border-collapse:collapse; font-size:14px; margin:8px 0; }
+  table.datos td{ padding:6px 4px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.datos td:first-child{ color:var(--wood); width:38%; font-size:12px; text-transform:uppercase; letter-spacing:.4px; }
+  .datos-qr{ text-align:center; margin:12px 0 4px; }
+  .datos-qr .qr-frame{ display:inline-block; background:#fff; padding:10px; border-radius:10px; border:1px solid var(--line); line-height:0; }
+  .datos-qr .qr-frame canvas, .datos-qr .qr-frame img{ display:block; }
+
+  .big-scan{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; width:100%; min-height:110px; margin:0 0 12px; border:none; border-radius:12px; background:var(--ember); color:#fff; font-family:'Karla',sans-serif; font-size:26px; font-weight:800; letter-spacing:.3px; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25); }
+  .big-scan:active{ transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,.25); }
+  .big-scan .ico{ font-size:38px; line-height:1; }
+  .big-scan small{ font-size:13px; font-weight:600; opacity:.9; letter-spacing:.2px; }
+  .tool-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
+  .tool-grid button{ padding:12px 6px; font-size:14px; width:100%; }
+  .search-wide{ width:100%; margin-bottom:16px; box-sizing:border-box; }
+  .scan-wrap{ position:relative; max-width:420px; margin:0 auto; }
+  .scan-wrap video{ width:100%; max-width:none !important; height:min(62vh,460px); object-fit:cover; display:block; }
+  .scan-frame{ position:absolute; left:50%; top:50%; width:68%; aspect-ratio:1/1; transform:translate(-50%,-50%); border:3px solid rgba(255,255,255,.9); border-radius:14px; box-shadow:0 0 0 999px rgba(0,0,0,.28); pointer-events:none; }
+  .photo-btn{ display:block; width:100%; box-sizing:border-box; text-align:center; padding:20px 12px; border-radius:10px; cursor:pointer; background:var(--ember); color:#fff; font-size:20px; font-weight:800; margin:0 0 10px; }
+  .scan-tip{ font-size:12px; color:var(--wood); margin:6px auto 0; max-width:360px; }
+
+  .scan-result{ position:fixed; inset:0; z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; color:#fff; cursor:pointer; }
+  .scan-result.show{ display:flex; }
+  .scan-result.ok{ background:#1F7A3A; } .scan-result.warn{ background:#B8741A; } .scan-result.fail{ background:#B0301F; }
+  .scan-result .big-ico{ font-size:120px; line-height:1; font-weight:800; }
+  .scan-result .sr-title{ font-size:30px; font-weight:800; margin:10px 0 6px; letter-spacing:.5px; text-transform:uppercase; }
+  .scan-result .sr-name{ font-size:24px; font-weight:700; }
+  .scan-result .sr-sub{ font-size:16px; opacity:.92; margin-top:6px; }
+  .scan-result .sr-tap{ position:absolute; bottom:22px; font-size:12px; opacity:.7; }
+    /* Botones a media anchura (antes ocupaban todo el ancho) */
+  .how-btn, .big-scan, .photo-btn, .btn-half{ width:50% !important; min-width:190px; margin-left:auto !important; margin-right:auto !important; box-sizing:border-box; }
+  .btn-half{ display:block; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topo admin-head">
+    <div class="corner-badge"><img class="logo-img" src="assets/logo.png" data-ev-img="logo" alt="Logo"></div>
+    <h1 data-ev="nombre">Retiro de Pastores</h1>
+    <p>Administración</p>
+  </header>
+  <div class="admin-nav"><a href="./">← Volver al registro</a> &nbsp;·&nbsp; <a href="scanner">Escáner</a></div>
+
+  <!-- ADMIN VIEW -->
+  <div class="view active" id="viewAdmin">
+    <main>
+      <div class="card" id="adminLoginCard">
+        <h2>Acceso de administrador</h2>
+        <p class="hint">Escribe el PIN de administrador.</p>
+        <input type="password" id="adminPinInput" inputmode="numeric" autocomplete="off" placeholder="PIN" style="width:100%;padding:14px;font-size:22px;text-align:center;letter-spacing:6px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')doAdminLogin()">
+        <p class="pin-error" id="pinError" style="min-height:20px;margin:8px 0;"></p>
+        <button class="primary btn-half" style="padding:16px;font-size:18px;" onclick="doAdminLogin()">Entrar</button>
+        <a href="./" class="ghost btn-half" style="text-align:center;margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:6px;text-decoration:none;color:var(--pine-dark);font-weight:700;">← Salir y volver al registro</a>
+      </div>
+
+      <div class="card" id="adminDashCard" style="display:none;">
+        <div class="panel" id="adminListPanel">
+          <h2>Panel de administración</h2>
+          <p class="hint">Registros sincronizados desde todos los teléfonos de participantes.</p>
+
+          <div id="syncStatus" class="result-box"></div>
+          <div class="admin-summary" id="adminSummary"></div>
+          <div id="tallyPanel"></div>
+
+          <button class="big-scan" onclick="openScanner()"><span class="ico">📷</span><span>Escanear QR</span><small>Entrada y comidas</small></button>
+          <div class="tool-grid">
+            <button class="ghost" onclick="loadRegistrations()">🔄 Actualizar</button>
+            <button class="ghost" onclick="exportSpreadsheet()">⬇️ Excel</button>
+            <button class="ghost" onclick="adminLogout()">🚪 Salir</button>
+          </div>
+          <input type="text" id="adminSearch" class="search-wide" placeholder="Buscar por nombre, iglesia o teléfono" oninput="renderAdminList()">
+
+          <div id="adminList"></div>
+        </div>
+
+        <div class="panel scanner-panel" id="scannerPanel" style="display:none;">
+          <h2>Escanear código de participante</h2>
+          <p class="hint">Funciona con los tres tipos de código: el QR de "registro" en un comprobante pendiente (abre la revisión de pago), la entrada, o un pase de comida.</p>
+          <label for="mealSelect" style="display:block;font-weight:700;margin:10px 0 4px;">Qué estás registrando ahora:</label>
+          <select id="mealSelect" style="width:100%;padding:10px;font-size:16px;margin-bottom:6px;"></select>
+          <div id="mealCounter" class="meal-counter"></div>
+          <div class="scan-wrap"><video id="scanVideo" autoplay muted playsinline></video><div class="scan-frame"></div></div>
+          <div class="scan-tip">Centra el QR dentro del cuadro y acércate hasta que llene la mitad. Si el QR está en otra pantalla, baja el brillo o aléjate un poco para evitar las líneas de la pantalla.</div>
+          <div style="margin:12px 0 0;">
+            <label class="photo-btn" for="photoScan">📷 Tomar foto del QR</label>
+            <input type="file" id="photoScan" accept="image/*" capture="environment" style="display:none;" onchange="scanFromPhoto(event)">
+          </div>
+          <canvas id="scanCanvas" style="display:none;"></canvas>
+          <div class="scan-status idle" id="scanStatus">Buscando código…</div>
+          <div class="scan-log" id="scanLog"></div>
+          <div class="nav-buttons"><button class="ghost" onclick="closeScanner()">Cerrar escáner</button><span></span></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+</div>
+
+<div class="scan-result" id="scanResult" onclick="hideScanResult()"><div class="big-ico" id="srIco"></div><div class="sr-title" id="srTitle"></div><div class="sr-name" id="srName"></div><div class="sr-sub" id="srSub"></div><div class="sr-tap">Toca para cerrar</div></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-close"><button class="ghost small" onclick="closeModal()">Cerrar</button></div>
+    <div id="modalContent"></div>
+  </div>
+</div>
+<script src="shared.js"></script>
+<script>
+aplicarEvento("Administración");
+function populateMealSelect(){
+  const sel = document.getElementById('mealSelect');
+  if(!sel || sel.options.length) return;
+  { const o0=document.createElement('option'); o0.value='e'; o0.textContent='Registro / entrada al retiro'; sel.appendChild(o0); }
+  MEALS.forEach((m,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=`Día ${m.dia} — ${m.tipo}`; sel.appendChild(o); });
+  try{ const v=localStorage.getItem('mealSel'); if(v!==null) sel.value=v; }catch(e){}
+  sel.onchange=()=>{ try{localStorage.setItem('mealSel',sel.value);}catch(e){} updateMealCounter(); };
+}
+document.addEventListener('DOMContentLoaded', populateMealSelect);
+
+let allRegistrations = [];
+let scanStream = null;
+let scanning = false;
+
+async function doAdminLogin(){
+  const input = document.getElementById('adminPinInput'), err = document.getElementById('pinError');
+  const tried = input.value.trim(); err.textContent = '';
+  if(!tried) return;
+  const ok = await window.storage.auth(tried);
+  if(ok === 'error'){
+    err.textContent = 'No hay conexión con el servidor. La app debe estar publicada en Vercel (no en GitHub Pages) y desplegada de nuevo después de agregar las variables.';
+  } else if(ok){
+    try{ sessionStorage.setItem('ciyPin', tried); }catch(e){}
+    input.value = '';
+    document.getElementById('adminLoginCard').style.display = 'none';
+    document.getElementById('adminDashCard').style.display = 'block';
+    startAdminWatch();
+  } else {
+    err.textContent = 'PIN incorrecto, intenta de nuevo.';
+    input.select();
+  }
+}
+function adminLogout(){
+  stopAdminWatch(); SESSION_PIN = '';
+  try{ sessionStorage.removeItem('ciyPin'); }catch(e){}
+  document.getElementById('adminDashCard').style.display = 'none';
+  document.getElementById('adminLoginCard').style.display = 'block';
+  closeScanner();
+}
+
+/* ---------- Admin: list & review ---------- */
+let adminUnwatch = null;
+let adminFilter = 'todos';
+function setAdminFilter(f){ adminFilter = f; renderAdminList(); }
+function applyRegistrations(list){
+  allRegistrations = list.slice().sort((a,b)=> (a.creado||'').localeCompare(b.creado||''));
+  renderAdminList();
+}
+async function startAdminWatch(){
+  stopAdminWatch();
+  const mode = await window.storage.mode();
+  const st = document.getElementById('syncStatus');
+  const hl = await window.storage.health();
+  if(st && !hl.ok){
+    st.className = 'result-box fail';
+    st.innerHTML = '<strong>La base de datos no responde</strong>' + esc(hl.error || 'Error desconocido') + '<br><small>Mientras no responda, los registros de los participantes no llegan a este panel.</small>';
+  } else if(st){
+    st.className = 'result-box ' + (mode !== 'local' ? 'ok' : 'fail');
+    st.innerHTML = mode !== 'local'
+      ? '<strong>Conectado a la base compartida</strong>Los registros llegan aquí en vivo desde los teléfonos de los participantes.'
+      : '<strong>Sin base compartida</strong>La app no está conectada a la base de datos del retiro: solo verás registros hechos en este mismo teléfono. Revisa la URL de Firebase configurada en el archivo.';
+  }
+  adminUnwatch = await window.storage.watch('registrations:', applyRegistrations);
+  loadRegistrations();
+}
+function stopAdminWatch(){ if(adminUnwatch){ try{ adminUnwatch(); }catch(e){} adminUnwatch = null; } }
+
+async function loadRegistrations(){
+  applyRegistrations(await window.storage.all('registrations:'));
+}
+
+function renderAdminList(){
+  const q = (document.getElementById('adminSearch').value || '').toLowerCase();
+  const list = allRegistrations.map((r,i)=>({r, n:i+1})).reverse().filter(({r}) =>
+    (adminFilter === 'todos' || r.estado === adminFilter) &&
+    ((r.nombreCompleto||'').toLowerCase().includes(q) || (r.iglesia||'').toLowerCase().includes(q) || (r.id||'').toLowerCase().includes(q) || (r.telefono||'').includes(q)));
+
+  const counts = { total: allRegistrations.length, aprobado:0, pendiente:0, rechazado:0 };
+  allRegistrations.forEach(r => { counts[r.estado] = (counts[r.estado]||0) + 1; });
+  const tile = (f, n, label) => `<button type="button" class="stat${adminFilter===f?' active':''}" onclick="setAdminFilter('${f}')"><b>${n}</b><span>${label}</span></button>`;
+  document.getElementById('adminSummary').innerHTML =
+    tile('todos', counts.total, 'Total') + tile('aprobado', counts.aprobado||0, 'Aprobados') +
+    tile('pendiente', counts.pendiente||0, 'Pendientes') + tile('rechazado', counts.rechazado||0, 'Rechazados');
+  renderTally(); updateMealCounter();
+
+  const container = document.getElementById('adminList');
+  if(list.length === 0){ container.innerHTML = '<p class="hint">' + (allRegistrations.length ? 'No hay registros en esta categoría.' : 'Aún no hay registros.') + '</p>'; return; }
+
+  container.innerHTML = list.map(({r,n}) => {
+    const mealsUsed = (r.comidas||[]).filter(m=>m && m.usado).length;
+    const entradaUsada = r.entradaEscaneada && r.entradaEscaneada.usado;
+    return `
+    <div class="camper-row clickable" role="button" tabindex="0" onclick="openDatos('${r.id}')" onkeydown="if(event.key==='Enter')openDatos('${r.id}')">
+      <div class="top">
+        <div>
+          <h3>${n}. ${esc(r.nombreCompleto)}${personasDe(r) > 1 ? '<span class="age-tag" style="background:#2F5D8A">FAMILIA (' + personasDe(r) + ')</span>' : ''}${r.tieneAlergias ? '<span class="allergy-tag">⚠ ALERGIAS</span>' : ''}${esMenor12(r) ? '<span class="age-tag">MENOR (' + edadDe(r) + ')</span>' : ''}${r.estado==='aprobado' ? (()=>{const p=pagoInfo(r); return '<span class="pay-tag '+p.clave+'">'+(p.clave==='completo'?(p.precio===0?'SIN COSTO':'PAGADO'):p.clave==='reserva'?'DEBE '+lempiras(p.saldo):'¿PAGO?')+'</span>';})() : ''}</h3>
+          <p>${esc(r.iglesia)}${r.telefono ? ' · Tel: ' + esc(r.telefono) : ''}</p>
+          <p class="tick-status">${esc(r.id)} · Entrada: ${entradaUsada ? '✓' : '—'} · Comidas: ${mealsUsed}/${MEALS.length}</p>
+        </div>
+        <div style="text-align:right;">
+          <span class="badge ${r.estado}">${r.estado === 'aprobado' ? 'Aprobado' : r.estado === 'rechazado' ? 'Rechazado' : 'Pendiente'}</span>
+          <div class="row-open">Abrir ›</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function exportSpreadsheet(){
+  if(!allRegistrations.length){ toast('No hay registros para exportar todavía.'); return; }
+  const mealHeaders = MEALS.map(m => `${m.tipo} D${m.dia}`);
+  const headers = ['#','ID','Nombre completo','Fecha nacimiento','Edad al ' + (EV.fechaInicio || 'inicio'),'Teléfono','Iglesia','Encargado','Contacto de emergencia','Número de emergencia','Bautizado','Alergias','Detalle de alergias','Personas','Familia','Categoría','Costo (L.)','Pago','Monto pagado (L.)','Saldo pendiente (L.)','Estado',
+    'Revisado manualmente',
+    'Fecha de registro','Entrada usada','Hora de entrada', ...mealHeaders];
+
+  const rows = allRegistrations.map((r,idx) => {
+    const v = r.verificacionPago || {};
+    const base = [
+      idx+1, r.id, r.nombreCompleto, r.fechaNacimiento, edadDe(r) === null ? '' : edadDe(r), r.telefono || '', r.iglesia, r.encargado || '',
+      r.contactoEmergencia || '', r.telEmergencia || '', r.bautizado || '', r.tieneAlergias ? 'Sí' : (r.bautizado ? 'No' : ''), r.tieneAlergias ? (r.alergias || '') : '',
+      personasDe(r), familiaTexto(r), categoriaDe(r), precioDe(r),
+      r.estado === 'aprobado' ? (precioDe(r)===0?'Sin costo':r.pago==='completo'?'Pago completo':r.pago==='reserva'?'Reserva':'Sin definir') : '',
+      r.estado === 'aprobado' ? pagoInfo(r).pagado : 0,
+      r.estado === 'aprobado' ? pagoInfo(r).saldo : '',
+      r.estado === 'aprobado' ? 'Aprobado' : r.estado === 'rechazado' ? 'Rechazado' : 'Pendiente',
+      r.revisadoManualmente ? 'Sí' : 'No',
+      r.creado ? new Date(r.creado).toLocaleString() : '',
+      (r.entradaEscaneada && r.entradaEscaneada.usado) ? 'Sí' : 'No',
+      (r.entradaEscaneada && r.entradaEscaneada.usado) ? new Date(r.entradaEscaneada.hora).toLocaleString() : ''
+    ];
+    const meals = MEALS.map((m, i) => {
+      const c = r.comidas && r.comidas[i];
+      return (c && c.usado) ? new Date(c.hora).toLocaleString() : 'No';
+    });
+    return [...base, ...meals];
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+  ws['!cols'] = headers.map(() => ({ wch: 18 }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Registros');
+  const st = mealStats();
+  const sum = [['Comida','Servidas'], ...st.meals.map(m=>[m.label, m.served]), ['Total de comidas servidas', st.totalMeals], [],
+    ['Entradas registradas', st.entradas], ['Pago completo', st.pagos.completos], ['Solo reserva', st.pagos.reservas], ['Pago sin definir', st.pagos.sin], ['Total cobrado (L.)', st.pagos.cobrado], ['Saldo por cobrar (L.)', st.pagos.pendiente], ['Inscritos aprobados', st.aprobados], ['Inscritos en total', st.inscritos], [],
+    ['Iglesia','Inscritos','Entraron','Comidas servidas'], ...st.churches.map(c=>[c.nombre, c.inscritos, c.entradas, c.comidas]),
+    ['Total', st.inscritos, st.entradas, st.totalMeals]];
+  const ws2 = XLSX.utils.aoa_to_sheet(sum); ws2['!cols'] = [{ wch:34 },{ wch:12 },{ wch:12 },{ wch:18 }];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Resumen de comidas');
+  const fecha = new Date().toISOString().slice(0,10);
+  const filename = `${SIGLAS.toLowerCase()}_registros_${fecha}.xlsx`;
+  let dl = null;
+  try{ dl = (window.claude && window.claude.use) ? await window.claude.use('downloads') : null; }catch(e){}
+  if(dl){
+    try{
+      const buf = XLSX.write(wb, { bookType:'xlsx', type:'array' });
+      await dl.save({ filename, data: new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }) });
+    }catch(e){ if(!e || e.code !== 'declined') toast('No se pudo guardar el archivo.'); }
+  } else {
+    XLSX.writeFile(wb, filename);
+  }
+}
+
+async function setEstado(id, estado, reopen, pago){
+  try{
+    const res = await window.storage.get('registrations:'+id, true);
+    if(!res) { toast('Registro no encontrado.'); return; }
+    const record = JSON.parse(res.value);
+    record.estado = estado;
+    if(pago){ record.pago = pago; record.montoPagado = pagoInfo(record).pagado; }
+    record.revisadoManualmente = true;
+    record.fechaRevision = new Date().toISOString();
+    const w = await window.storage.set('registrations:'+id, JSON.stringify(record), true);
+    if(!w.synced) toast('No se pudo guardar el cambio en la base compartida.');
+    else toast(estado === 'aprobado' ? 'Aprobado ✓ — ' + pagoInfo(record).texto : estado === 'rechazado' ? 'Rechazado' : 'Vuelto a pendiente');
+  }catch(e){ toast('Error al guardar el cambio.'); }
+  await loadRegistrations();
+  if(reopen) openDatos(id);
+}
+
+function openModal(id){ openDatos(id); }
+async function cambiarPago(id, pago){
+  try{
+    const res = await window.storage.get('registrations:'+id, true);
+    if(!res){ toast('Registro no encontrado.'); return; }
+    const rec = JSON.parse(res.value);
+    rec.pago = pago; rec.montoPagado = pagoInfo(rec).pagado; rec.fechaPago = new Date().toISOString();
+    const w = await window.storage.set('registrations:'+id, JSON.stringify(rec), true);
+    if(!w.synced){ toast('No se pudo guardar el cambio.'); return; }
+    toast('Pago actualizado: ' + pagoInfo(rec).texto);
+  }catch(e){ toast('Error al guardar el cambio.'); }
+  await loadRegistrations(); openDatos(id);
+}
+async function loadReceipt(r){
+  const slot = document.getElementById('receiptSlot');
+  let html = '<p>Sin imagen de comprobante.</p>';
+  try{
+    const res = await window.storage.get('receipts:'+r.id, true);
+    if(res){ const rc = JSON.parse(res.value); if(rc.img) html = `<img src="data:${rc.tipo||'image/jpeg'};base64,${rc.img}">`; }
+    else if(r.comprobanteImagen){ html = `<img src="data:${r.comprobanteTipo};base64,${r.comprobanteImagen}">`; }
+  }catch(e){}
+  if(slot) slot.innerHTML = html;
+}
+function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
+
+
+const EDAD_AVISO = Number(EV.edadAviso) || 12;
+function esMenor12(r){ const e = edadDe(r); return e !== null && e < EDAD_AVISO; }
+
+/* ---------- Conteo de comidas ---------- */
+function mealStats(){
+  const regs = allRegistrations;
+  const meals = MEALS.map((m,i)=>({ label:`Día ${m.dia} — ${m.tipo}`, served: regs.filter(r=>r.comidas && r.comidas[i] && r.comidas[i].usado).reduce((t,r)=>t + personasDe(r), 0) }));
+  const entradas = regs.filter(r=>r.entradaEscaneada && r.entradaEscaneada.usado).reduce((t,r)=>t + personasDe(r), 0);
+  const totalMeals = meals.reduce((a,m)=>a+m.served,0);
+  const aprobados = regs.filter(r=>r.estado==='aprobado').reduce((t,r)=>t + personasDe(r), 0);
+  const byChurch = {};
+  regs.forEach(r=>{
+    const key = (r.iglesia||'Sin iglesia').trim().toLowerCase();
+    const c = byChurch[key] = byChurch[key] || { nombre:(r.iglesia||'Sin iglesia').trim(), inscritos:0, aprobados:0, entradas:0, comidas:0 };
+    const np = personasDe(r); c.inscritos += np; if(r.estado==='aprobado') c.aprobados += np;
+    if(r.entradaEscaneada && r.entradaEscaneada.usado) c.entradas += np;
+    c.comidas += (r.comidas||[]).filter(x=>x && x.usado).length * np;
+  });
+  const churches = Object.values(byChurch).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  const ap = regs.filter(r=>r.estado==='aprobado');
+  const pagos = { completos: ap.filter(r=>r.pago==='completo').length, reservas: ap.filter(r=>r.pago==='reserva').length, sin: ap.filter(r=>r.pago!=='completo' && r.pago!=='reserva').length };
+  pagos.cobrado = ap.reduce((t,r)=>t + pagoInfo(r).pagado, 0);
+  pagos.pendiente = ap.reduce((t,r)=>t + pagoInfo(r).saldo, 0);
+  return { meals, entradas, totalMeals, aprobados, inscritos: regs.reduce((t,r)=>t + personasDe(r), 0), churches, pagos };
+}
+function renderTally(){
+  const box = document.getElementById('tallyPanel'); if(!box) return;
+  const st = mealStats();
+  const open = box.querySelector('details') ? box.querySelector('details').open : false;
+  box.innerHTML = `<details class="tally"${open?' open':''}>
+    <summary>📊 Conteo de comidas <small>— ${st.totalMeals} servidas en total</small></summary>
+    <div class="tally-body">
+      <table class="tally-table">
+        <tr><th>Comida</th><th class="n">Servidas</th><th class="n">Faltan*</th></tr>
+        ${st.meals.map(m=>`<tr><td>${esc(m.label)}</td><td class="n">${m.served}</td><td class="n">${Math.max(st.aprobados - m.served,0)}</td></tr>`).join('')}
+        <tr class="total"><td>Total de comidas servidas</td><td class="n">${st.totalMeals}</td><td></td></tr>
+      </table>
+      <p class="small-note">*Faltan = inscritos aprobados que aún no han recibido esa comida (${st.aprobados} aprobados).</p>
+      <p class="tally-h">Entrada: ${st.entradas} de ${st.aprobados} aprobados han llegado</p>
+      <p class="tally-h">Pagos (aprobados)</p>
+      <table class="tally-table">
+        <tr><td>Pago completo${PRECIOS ? '' : ' (' + lempiras(PRECIO_TOTAL) + ')'}</td><td class="n">${st.pagos.completos}</td></tr>
+        ${RESERVA_ACTIVA ? `<tr><td>Solo reserva (${lempiras(PRECIO_RESERVA)})</td><td class="n">${st.pagos.reservas}</td></tr>` : ''}
+        <tr><td>Sin definir</td><td class="n">${st.pagos.sin}</td></tr>
+        <tr><td>Total cobrado</td><td class="n">${lempiras(st.pagos.cobrado)}</td></tr>
+        <tr class="total"><td>Saldo por cobrar</td><td class="n">${lempiras(st.pagos.pendiente)}</td></tr>
+      </table>
+      <p class="tally-h">Por iglesia</p>
+      <table class="tally-table">
+        <tr><th>Iglesia</th><th class="n">Inscritos</th><th class="n">Entraron</th><th class="n">Comidas</th></tr>
+        ${st.churches.map(c=>`<tr><td>${esc(c.nombre)}</td><td class="n">${c.inscritos}</td><td class="n">${c.entradas}</td><td class="n">${c.comidas}</td></tr>`).join('')}
+        <tr class="total"><td>Total</td><td class="n">${st.inscritos}</td><td class="n">${st.entradas}</td><td class="n">${st.totalMeals}</td></tr>
+      </table>
+      <div class="row-actions"><button class="ghost small" onclick="copyTally()">📋 Copiar resumen para los líderes</button></div>
+    </div></details>`;
+}
+function tallyText(){
+  const st = mealStats();
+  const L = [(EV.nombre || 'Evento') + ' — Resumen de comidas', new Date().toLocaleString(), ''];
+  st.meals.forEach(m=>L.push(`${m.label}: ${m.served}`));
+  L.push('', `Pagos: ${st.pagos.completos} completos, ${st.pagos.reservas} solo reserva. Cobrado ${lempiras(st.pagos.cobrado)}, por cobrar ${lempiras(st.pagos.pendiente)}`, `Total de comidas servidas: ${st.totalMeals}`, `Entradas registradas: ${st.entradas} de ${st.aprobados} aprobados (${st.inscritos} inscritos)`, '', 'Por iglesia:');
+  st.churches.forEach(c=>L.push(`${c.nombre}: ${c.inscritos} inscritos, ${c.entradas} entraron, ${c.comidas} comidas`));
+  return L.join('\n');
+}
+async function copyTally(){
+  const text = tallyText();
+  try{ await navigator.clipboard.writeText(text); toast('Resumen copiado. Pégalo en WhatsApp o donde quieras.'); return; }catch(e){}
+  try{ if(navigator.share){ await navigator.share({ text }); return; } }catch(e){ if(e && e.name === 'AbortError') return; }
+  toast('No se pudo copiar. Selecciona el texto de la tabla manualmente.');
+}
+function updateMealCounter(){
+  const el = document.getElementById('mealCounter'), sel = document.getElementById('mealSelect');
+  if(!el || !sel || !sel.options.length) return;
+  const st = mealStats();
+  if(sel.value === 'e') el.textContent = `Entradas registradas: ${st.entradas} de ${st.aprobados} aprobados`;
+  else { const i = parseInt(sel.value)||0; el.textContent = `${st.meals[i].label}: ${st.meals[i].served} servidas de ${st.aprobados} aprobados`; }
+}
+
+/* ---------- Datos del participante + QR pequeño para volver a compartir ---------- */
+function openDatos(id){
+  const r = allRegistrations.find(x => x.id === id);
+  if(!r) return;
+  const estadoTxt = r.estado === 'aprobado' ? 'Aprobado' : r.estado === 'rechazado' ? 'Rechazado' : 'Pendiente';
+  const entradaOk = r.entradaEscaneada && r.entradaEscaneada.usado;
+  const chips = MEALS.map((m,i)=>{ const u = r.comidas && r.comidas[i] && r.comidas[i].usado; return `<span class="${u?'used':''}" style="cursor:pointer;padding:6px 10px;" onclick="toggleUso('${esc(r.id)}',${i})">${u?'✓ ':''}D${m.dia} ${esc(m.tipo)}</span>`; }).join('');
+  document.getElementById('modalContent').innerHTML = `
+    <h2>${esc(r.nombreCompleto)}</h2>
+    <p class="hint"><span class="badge ${esc(r.estado)}">${estadoTxt}</span> &nbsp;<span style="font-family:monospace;">${esc(r.id)}</span></p>
+
+    ${esMenor12(r) ? `<div class="age-alert">MENOR (${edadDe(r)})<br><b>Menor de ${EDAD_AVISO} años al iniciar el evento (${esc(EV.fechaTexto || '')})</b></div>` : ''}
+    ${r.tieneAlergias ? `<div class="allergy-alert">⚠️ ALERGIAS<br><b>${esc(r.alergias || 'Sin detalle')}</b></div>` : ''}
+    ${r.estado === 'aprobado' ? (()=>{ const p = pagoInfo(r); return `<div class="pay-banner ${p.clave}">${p.clave==='completo' ? (p.precio===0 ? '✓ SIN COSTO' : '✓ PAGO COMPLETO · ' + lempiras(p.precio)) : p.clave==='reserva' ? '⚠ RESERVA ' + lempiras(p.pagado) + ' — DEBE ' + lempiras(p.saldo) : '⚠ APROBADO SIN DEFINIR PAGO'}</div>
+      <div class="btn-row">${p.clave !== 'completo' ? `<button class="primary" style="background:var(--ok);" onclick="cambiarPago('${esc(r.id)}','completo')">💰 Marcar pago completo</button>` : ''}${p.clave !== 'reserva' && RESERVA_ACTIVA && p.precio > PRECIO_RESERVA ? `<button class="ghost" onclick="cambiarPago('${esc(r.id)}','reserva')">Cambiar a reserva ${lempiras(Math.min(PRECIO_RESERVA, p.precio))}</button>` : ''}</div>`; })() : ''}
+    <div class="detail-sec">Comprobante de pago</div>
+    <div id="receiptSlot" class="receipt-box"><p class="hint">Cargando comprobante…</p></div>
+    <div class="btn-row">
+      ${r.estado !== 'aprobado' ? `${RESERVA_ACTIVA && precioDe(r) > PRECIO_RESERVA ? `<button class="primary" onclick="setEstado('${esc(r.id)}','aprobado',true,'reserva')">✓ Aprobar · Reserva ${lempiras(Math.min(PRECIO_RESERVA, precioDe(r)))}</button>` : ''}<button class="primary" style="background:var(--ok);" onclick="setEstado('${esc(r.id)}','aprobado',true,'completo')">✓ Aprobar · ${precioDe(r) === 0 ? 'Sin costo' : 'Pago completo ' + lempiras(precioDe(r))}</button>` : ''}
+      ${r.estado !== 'rechazado' ? `<button class="ghost" onclick="setEstado('${esc(r.id)}','rechazado',true)">✕ Rechazar</button>` : ''}
+      ${r.estado !== 'pendiente' ? `<button class="ghost" onclick="setEstado('${esc(r.id)}','pendiente',true)">Volver a pendiente</button>` : ''}
+    </div>
+
+    ${r.familia ? `<div class="detail-sec">Familia · ${personasDe(r)} personas</div>
+    <table class="datos">
+      ${detalleFamilia(r.familia).map(p => `<tr><td>${esc(p.rol)}</td><td>${esc(p.nombre)}${p.rol === 'Hijo/a' ? ' · ' + esc(p.fechaNacimiento || 'sin fecha') + (p.edad !== null ? ' (' + p.edad + ' años)' : '') : ''} — <b>${p.precio === 0 ? 'Gratis' : lempiras(p.precio)}</b></td></tr>`).join('')}
+      <tr><td>Total</td><td><b>${lempiras(precioDe(r))}</b> · depósito pedido ${lempiras(depositoDe(precioDe(r)))}</td></tr>
+    </table>` : ''}
+    <div class="detail-sec">Datos ${r.familia ? 'del pastor' : 'del participante'}</div>
+    <table class="datos">
+      <tr><td>Teléfono</td><td>${esc(r.telefono || '—')}</td></tr>
+      <tr><td>Nacimiento</td><td>${esc(r.fechaNacimiento || '—')}${edadDe(r) !== null ? ' (' + edadDe(r) + ' años)' : ''}</td></tr>
+      <tr><td>Iglesia</td><td>${esc(r.iglesia || '—')}</td></tr>
+      <tr><td>Líder / pastor</td><td>${esc(r.encargado || '—')}</td></tr>
+      <tr><td>Contacto de emergencia</td><td>${esc(r.contactoEmergencia || '—')}</td></tr>
+      <tr><td>Número de emergencia</td><td>${esc(r.telEmergencia || '—')}</td></tr>
+      <tr><td>Bautizado</td><td>${esc(r.bautizado || '—')}</td></tr>
+      <tr><td>Registrado</td><td>${r.creado ? new Date(r.creado).toLocaleString() : '—'}</td></tr>
+    </table>
+    <div class="datos-qr">
+      <div class="qr-frame"><div id="datosQr"></div></div>
+      <p class="small-note">Código QR del participante</p>
+      <button class="ghost small" id="datosShareBtn">Compartir / guardar imagen</button>
+      <div class="small-note" id="datosMsg"></div>
+    </div>
+
+    <div class="detail-sec">Registro y comidas</div>
+    <p class="small-note">Toca para borrar o marcar si fue un error.</p>
+    <div class="btn-row"><button class="${entradaOk?'primary':'ghost'}" onclick="toggleUso('${esc(r.id)}','e')">${entradaOk ? '✓ Entrada registrada · borrar' : 'Marcar entrada'}</button></div>
+    <div class="meal-chips">${chips}</div>
+
+    <div class="detail-sec">Más opciones</div>
+    <div class="btn-row">
+      <button class="ghost" onclick="openEdit('${esc(r.id)}')">✏️ Editar</button>
+      <button class="ghost" style="color:var(--bad);" onclick="confirmDelete('${esc(r.id)}')">🗑 Eliminar</button>
+    </div>
+    <div class="btn-row"><button class="ghost" onclick="closeModal()">Cerrar</button></div>`;
+  document.getElementById('modalOverlay').classList.add('active');
+  try{ new QRCode(document.getElementById('datosQr'), { text: qrPayload(r), width: 140, height: 140, correctLevel: QRCode.CorrectLevel.M }); }catch(e){}
+  document.getElementById('datosShareBtn').onclick = () => saveTicketImage(r, r.estado === 'aprobado', document.getElementById('datosMsg'));
+  loadReceipt(r);
+}
+async function toggleUso(id, which){
+  try{
+    const res = await window.storage.get('registrations:'+id, true);
+    if(!res){ toast('Registro no encontrado.'); return; }
+    const rec = JSON.parse(res.value);
+    let was, label;
+    if(which === 'e'){ was = rec.entradaEscaneada && rec.entradaEscaneada.usado; label = 'la entrada'; }
+    else { was = rec.comidas && rec.comidas[which] && rec.comidas[which].usado; label = `${MEALS[which].tipo} (Día ${MEALS[which].dia})`; }
+    if(!confirm(was ? `¿Borrar el registro de ${label} para ${rec.nombreCompleto}?` : `¿Marcar ${label} como usada para ${rec.nombreCompleto}?`)) return;
+    const val = was ? { usado:false, hora:null } : { usado:true, hora:new Date().toISOString() };
+    if(which === 'e') rec.entradaEscaneada = val;
+    else { rec.comidas = rec.comidas || MEALS.map(()=>({usado:false,hora:null})); rec.comidas[which] = val; }
+    const w = await window.storage.set('registrations:'+id, JSON.stringify(rec), true);
+    if(!w.synced){ toast('No se pudo guardar el cambio.'); return; }
+    toast(was ? 'Registro borrado ✓' : 'Marcado ✓');
+    await loadRegistrations();
+    openDatos(id);
+  }catch(e){ toast('Error al guardar el cambio.'); }
+}
+
+/* ---------- Admin: editar / eliminar ---------- */
+function openEdit(id){
+  const r = allRegistrations.find(x => x.id === id);
+  if(!r) return;
+  document.getElementById('modalContent').innerHTML = `
+    <h2>Editar registro</h2>
+    <p class="hint">ID ${esc(r.id)} — los códigos QR del participante siguen siendo válidos.</p>
+    <label>Nombre completo</label><input type="text" id="edNombre" value="${esc(r.nombreCompleto)}">
+    <label>Fecha de nacimiento (año/mes/día)</label><input type="text" id="edFecha" value="${esc(r.fechaNacimiento)}" placeholder="2008/05/21">
+    <label>Teléfono</label><input type="text" id="edTelefono" inputmode="numeric" maxlength="8" value="${esc(r.telefono||'')}">
+    <label>Iglesia</label><input type="text" id="edIglesia" value="${esc(r.iglesia)}">
+    <label>Encargado</label><input type="text" id="edEncargado" value="${esc(r.encargado||'')}">
+    <label>Contacto de emergencia</label><input type="text" id="edContacto" value="${esc(r.contactoEmergencia||'')}">
+    <label>Número de emergencia</label><input type="text" id="edTelEmerg" inputmode="numeric" maxlength="8" value="${esc(r.telEmergencia||'')}">
+    <label>Bautizado</label><select id="edBautizado"><option value=""${!r.bautizado?' selected':''}>—</option><option value="Sí"${r.bautizado==='Sí'?' selected':''}>Sí</option><option value="No"${r.bautizado==='No'?' selected':''}>No</option></select>
+    <label>Alergias (déjalo vacío si no tiene)</label><input type="text" id="edAlergias" value="${esc(r.tieneAlergias ? (r.alergias||'') : '')}">
+    <div class="row-actions" style="margin-top:14px;">
+      <button class="primary small" onclick="saveEdit('${r.id}')">Guardar cambios</button>
+      <button class="ghost small" onclick="openDatos('${r.id}')">Cancelar</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+async function saveEdit(id){
+  const nombre = document.getElementById('edNombre').value.trim();
+  const fecha = document.getElementById('edFecha').value.trim();
+  const iglesia = document.getElementById('edIglesia').value.trim();
+  if(!nombre || !iglesia){ toast('El nombre y la iglesia son obligatorios.'); return; }
+  try{
+    const res = await window.storage.get('registrations:'+id, true);
+    if(!res){ toast('Registro no encontrado.'); return; }
+    const record = JSON.parse(res.value);
+    record.nombreCompleto = nombre; record.fechaNacimiento = fecha; record.iglesia = iglesia;
+    record.telefono = (document.getElementById('edTelefono').value || '').replace(/\D/g,'');
+    record.encargado = document.getElementById('edEncargado').value.trim();
+    record.contactoEmergencia = document.getElementById('edContacto').value.trim();
+    record.telEmergencia = (document.getElementById('edTelEmerg').value || '').replace(/\D/g,'');
+    record.bautizado = document.getElementById('edBautizado').value;
+    record.alergias = document.getElementById('edAlergias').value.trim();
+    record.tieneAlergias = !!record.alergias;
+    record.editadoAdmin = new Date().toISOString();
+    const w = await window.storage.set('registrations:'+id, JSON.stringify(record), true);
+    if(!w.synced) toast('No se pudo guardar en la base compartida.'); else toast('Cambios guardados.');
+  }catch(e){ toast('Error al guardar.'); }
+  await loadRegistrations();
+  openDatos(id);
+}
+function confirmDelete(id){
+  const r = allRegistrations.find(x => x.id === id);
+  if(!r) return;
+  document.getElementById('modalContent').innerHTML = `
+    <h2>¿Eliminar registro?</h2>
+    <p class="hint">${esc(r.nombreCompleto)} (${esc(r.id)}). Se borrarán el registro y el comprobante. No se puede deshacer.</p>
+    <div class="row-actions" style="margin-top:14px;">
+      <button class="primary small" style="background:var(--bad);" onclick="doDelete('${r.id}')">Sí, eliminar</button>
+      <button class="ghost small" onclick="openDatos('${r.id}')">Cancelar</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+async function doDelete(id){
+  try{
+    await window.storage.delete('registrations:'+id, true);
+    await window.storage.delete('receipts:'+id, true);
+    toast('Registro eliminado.');
+  }catch(e){ toast('No se pudo eliminar.'); }
+  closeModal();
+  loadRegistrations();
+}
+
+/* ---------- Admin: camera QR scanner ---------- */
+function openScanner(){
+  document.getElementById('adminListPanel').style.display = 'none';
+  document.getElementById('scannerPanel').style.display = 'block';
+  startScanner();
+}
+function closeScanner(){
+  document.getElementById('scannerPanel').style.display = 'none';
+  document.getElementById('adminListPanel').style.display = 'block';
+  scanning = false;
+  if(scanStream){ scanStream.getTracks().forEach(t=>t.stop()); scanStream = null; }
+}
+async function startScanner(){
+  const video = document.getElementById('scanVideo');
+  setScanStatus('idle', 'Abriendo cámara…');
+  const libOk = await window.jsqrReady;
+  if(!libOk && !nativeDetector){ setScanStatus('fail', 'El lector de QR no se pudo cargar (revisa tu internet y recarga la página).'); }
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    setScanStatus('fail', 'Este navegador no permite cámara en vivo. Usa el botón "Tomar foto del QR".'); return;
+  }
+  try{
+    try{
+      scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:{ideal:'environment'}, width:{ideal:1280}, height:{ideal:720} }, audio:false });
+    }catch(e1){
+      scanStream = await navigator.mediaDevices.getUserMedia({ video:true, audio:false });
+    }
+    video.srcObject = scanStream;
+    try{
+      const tr = scanStream.getVideoTracks()[0]; const caps = tr.getCapabilities ? tr.getCapabilities() : {};
+      if(caps.focusMode && caps.focusMode.includes('continuous')) await tr.applyConstraints({ advanced:[{ focusMode:'continuous' }] });
+    }catch(e2){}
+    await video.play();
+    scanning = true; scanTries = 0;
+    setScanStatus('idle', 'Cámara lista. Apunta al código QR…');
+    requestAnimationFrame(tickScan);
+  }catch(e){
+    const name = e && e.name ? e.name : '';
+    const msg = (name === 'NotAllowedError' || name === 'SecurityError')
+      ? 'La cámara está bloqueada. Permite la cámara para este sitio en los ajustes del navegador y vuelve a abrir el escáner. Mientras tanto usa "Tomar foto del QR".'
+      : 'No se pudo abrir la cámara en vivo (' + (name || 'error') + '). Usa el botón "Tomar foto del QR".';
+    setScanStatus('fail', msg);
+  }
+}
+/* Intenta leer un QR en una imagen: varios tamaños y recortes para tolerar desenfoque y pantallas */
+let nativeDetector = null;
+try{ if('BarcodeDetector' in window) nativeDetector = new BarcodeDetector({ formats:['qr_code'] }); }catch(e){ nativeDetector = null; }
+function decodeWithJsQR(source, sw, sh){
+  if(!window.jsQR) return null;
+  const work = document.createElement('canvas'); const ctx = work.getContext('2d', { willReadFrequently:true });
+  const attempts = [];
+  [640, 960, 1280].forEach(max => { const k = Math.min(1, max/Math.max(sw,sh)); attempts.push({ sx:0, sy:0, cw:sw, ch:sh, k }); });
+  const side = Math.min(sw,sh)*0.7; attempts.push({ sx:(sw-side)/2, sy:(sh-side)/2, cw:side, ch:side, k:Math.min(1, 700/side) });
+  for(const at of attempts){
+    const w = Math.max(1, Math.round(at.cw*at.k)), h = Math.max(1, Math.round(at.ch*at.k));
+    work.width = w; work.height = h; ctx.drawImage(source, at.sx, at.sy, at.cw, at.ch, 0, 0, w, h);
+    const d = ctx.getImageData(0,0,w,h);
+    const code = jsQR(d.data, w, h, { inversionAttempts:'attemptBoth' });
+    if(code && code.data) return code.data;
+  }
+  return null;
+}
+async function decodeQrFrom(source, sw, sh){
+  if(nativeDetector){
+    try{ const r = await nativeDetector.detect(source); if(r && r.length && r[0].rawValue) return r[0].rawValue; }catch(e){}
+  }
+  return decodeWithJsQR(source, sw, sh);
+}
+function scanFromPhoto(evt){
+  const file = evt.target.files[0]; evt.target.value = '';
+  if(!file) return;
+  setScanStatus('idle', 'Leyendo la foto…');
+  const img = new Image();
+  img.onload = async () => {
+    let data = null;
+    try{ data = await decodeQrFrom(img, img.naturalWidth || img.width, img.naturalHeight || img.height); }
+    catch(e){ setScanStatus('fail', 'Error al leer la foto: ' + (e && e.message ? e.message : e)); URL.revokeObjectURL(img.src); return; }
+    URL.revokeObjectURL(img.src);
+    if(!data && !window.jsQR && !nativeDetector){ setScanStatus('fail', 'El lector de QR no se pudo cargar. Revisa tu internet y recarga la página.'); return; }
+    if(data) handleScannedPayload(data);
+    else { setScanStatus('fail', 'No se encontró un QR en la foto.'); logScan('fail', 'No se encontró un QR en la foto. Acércate para que el QR llene la mitad de la foto, sin reflejos, e intenta de nuevo.'); }
+  };
+  img.onerror = () => setScanStatus('fail', 'No se pudo abrir la foto. Intenta de nuevo.');
+  img.src = URL.createObjectURL(file);
+}
+let scanTries = 0;
+let decoding = false;
+async function tickScan(){
+  if(!scanning) return;
+  const video = document.getElementById('scanVideo');
+  if(video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth){
+    scanTries++;
+    // se prueba una de cada 3 imágenes para no saturar el teléfono
+    if(scanTries % 3 === 0 && !decoding){
+      decoding = true; let data = null;
+      try{ data = await decodeQrFrom(video, video.videoWidth, video.videoHeight); }catch(e){}
+      decoding = false;
+      if(!scanning) return;
+      if(data){
+        scanning = false;
+        handleScannedPayload(data).finally(()=>{
+          setTimeout(()=>{ scanning = true; requestAnimationFrame(tickScan); }, 2000);
+        });
+        return;
+      }
+    }
+  }
+  requestAnimationFrame(tickScan);
+}
+function setScanStatus(kind, msg){
+  const el = document.getElementById('scanStatus');
+  el.className = 'scan-status ' + kind;
+  el.textContent = msg;
+}
+let srTimer = null;
+function hideScanResult(){ const el=document.getElementById('scanResult'); if(el) el.classList.remove('show'); clearTimeout(srTimer); }
+function showScanResult(kind, title, name, sub){
+  const el = document.getElementById('scanResult'); if(!el) return;
+  el.className = 'scan-result show ' + kind;
+  document.getElementById('srIco').textContent = kind === 'ok' ? '✓' : kind === 'warn' ? '!' : '✕';
+  document.getElementById('srTitle').textContent = title || '';
+  document.getElementById('srName').textContent = name || '';
+  document.getElementById('srSub').textContent = sub || '';
+  try{ if(navigator.vibrate) navigator.vibrate(kind === 'ok' ? 120 : [120,80,120]); }catch(e){}
+  try{
+    const AC = window.AudioContext || window.webkitAudioContext; const ac = new AC(); const o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.value = kind === 'ok' ? 880 : 300; o.connect(g); g.connect(ac.destination); g.gain.value = .15; o.start(); o.stop(ac.currentTime + (kind==='ok'?.15:.35));
+  }catch(e){}
+  clearTimeout(srTimer); srTimer = setTimeout(hideScanResult, kind === 'ok' ? 1500 : 2600);
+}
+function logScan(kind, msg, res){
+  setScanStatus(kind === 'ok' ? 'ok' : kind === 'warn' ? 'warn' : 'fail', msg);
+  if(res) showScanResult(kind, res.title, res.name, res.sub);
+  const log = document.getElementById('scanLog');
+  const line = document.createElement('div');
+  line.textContent = new Date().toLocaleTimeString() + ' — ' + msg;
+  log.prepend(line);
+}
+async function handleScannedPayload(text){
+  let payload;
+  try{ payload = JSON.parse(text); }catch(e){ logScan('fail','Código QR no reconocido.',{title:'QR no reconocido'}); return; }
+  if(!payload.id){ logScan('fail','Código QR no pertenece a este retiro.',{title:'QR de otro evento'}); return; }
+  let record;
+  try{
+    const res = await window.storage.get('registrations:'+payload.id, true);
+    record = res ? JSON.parse(res.value) : null;
+  }catch(e){ record = null; }
+
+  if(!record){
+    if(payload.n){
+      logScan('warn', `No hay registro en el servidor para ${payload.n}. Puedes crearlo con los datos del código.`);
+      closeScanner();
+      openCreateFromQr(payload);
+    } else logScan('fail', 'Registro no encontrado.',{title:'Registro no encontrado'});
+    return;
+  }
+  if(record.estado === 'pendiente'){
+    logScan('warn', `PENDIENTE de aprobación — ${record.nombreCompleto}. Abriendo revisión…`,{title:'Pendiente de aprobación', name:nombreConFamilia(record), sub:'Abriendo revisión…'});
+    closeScanner();
+    await loadRegistrations();
+    openModal(record.id);
+    return;
+  }
+  const pg = pagoInfo(record);
+  const payNote = pg.clave === 'completo' ? (pg.precio === 0 ? '✓ SIN COSTO' : '✓ PAGADO') : pg.clave === 'reserva' ? `⚠ DEBE ${lempiras(pg.saldo)} (solo reserva)` : '⚠ PAGO SIN DEFINIR';
+  const payKind = pg.clave === 'completo' ? 'ok' : 'warn';
+  if(record.estado !== 'aprobado'){
+    logScan('fail', `RECHAZADO — ${record.nombreCompleto}. No permitir el ingreso.`,{title:'Rechazado', name:nombreConFamilia(record), sub:'No permitir el ingreso'});
+    return;
+  }
+
+  populateMealSelect();
+  const mode = document.getElementById('mealSelect').value;
+  if(!record.comidas) record.comidas = MEALS.map(()=>({usado:false, hora:null}));
+  if(mode === 'e'){
+    if(record.entradaEscaneada && record.entradaEscaneada.usado){
+      logScan('warn', `Entrada YA registrada (${new Date(record.entradaEscaneada.hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:'Registro: ya usado', name:nombreConFamilia(record), sub:'Registrado a las ' + new Date(record.entradaEscaneada.hora).toLocaleTimeString()});
+      return;
+    }
+    record.entradaEscaneada = { usado:true, hora:new Date().toISOString() };
+    const w = await window.storage.set('registrations:'+record.id, JSON.stringify(record), true);
+    if(!w.synced){ logScan('fail', 'No se pudo guardar en el servidor. Intenta de nuevo.',{title:'No se guardó', sub:'Intenta de nuevo'}); return; }
+    logScan(payKind, `Entrada válida — ${record.nombreCompleto} (${record.iglesia}) · ${payNote}`,{title:'Registro / entrada', name:nombreConFamilia(record), sub:payNote + (record.tieneAlergias ? ' · ⚠ ALERGIAS: ' + record.alergias : '')});
+  } else {
+    const idx = parseInt(mode) || 0;
+    const meal = MEALS[idx];
+    const label = `${meal.tipo} (Día ${meal.dia})`;
+    if(record.comidas[idx] && record.comidas[idx].usado){
+      logScan('warn', `${label} YA utilizado (${new Date(record.comidas[idx].hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:`D${meal.dia} ${meal.tipo}: ya usado`, name:nombreConFamilia(record), sub:'Usado a las ' + new Date(record.comidas[idx].hora).toLocaleTimeString()});
+      return;
+    }
+    record.comidas[idx] = { usado:true, hora:new Date().toISOString() };
+    const w = await window.storage.set('registrations:'+record.id, JSON.stringify(record), true);
+    if(!w.synced){ logScan('fail', 'No se pudo guardar en el servidor. Intenta de nuevo.',{title:'No se guardó', sub:'Intenta de nuevo'}); return; }
+    logScan(payKind, `${label} válido — ${record.nombreCompleto} · ${payNote}`,{title:`D${meal.dia} ${meal.tipo}`, name:nombreConFamilia(record), sub:payNote + (record.tieneAlergias ? ' · ⚠ ALERGIAS: ' + record.alergias : '')});
+  }
+  loadRegistrations();
+}
+
+/* Registro en mesa a partir de los datos del QR (si el teléfono del participante no pudo enviarlo antes) */
+function openCreateFromQr(payload){
+  document.getElementById('modalContent').innerHTML = `
+    <h2>Registro no encontrado</h2>
+    <p class="hint">El código ${esc(payload.id)} no está en el servidor (el teléfono del participante no pudo enviarlo). El código trae estos datos:</p>
+    <p><b>${esc(payload.n)}</b><br>${esc(payload.i || '')}</p>
+    <p class="hint">Si lo creas, queda como <b>pendiente</b>. Verifica su pago y luego apruébalo.</p>
+    <div class="row-actions" style="margin-top:14px;">
+      <button class="primary small" id="createFromQrBtn">Crear registro</button>
+      <button class="ghost small" onclick="closeModal()">Cancelar</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('active');
+  document.getElementById('createFromQrBtn').onclick = async () => {
+    const m = /^[A-Z0-9]+-(\d{8})/.exec(payload.id);
+    const rec = {
+      id: payload.id, nombreCompleto: payload.n, fechaNacimiento: '', telefono: m ? m[1] : '',
+      iglesia: payload.i || '', encargado: '', verificacionPago: {}, estado: 'pendiente', tieneComprobante: false,
+      entradaEscaneada: { usado:false, hora:null }, comidas: MEALS.map(()=>({usado:false, hora:null})),
+      creado: new Date().toISOString(), creadoEnMesa: true
+    };
+    const w = await window.storage.set('registrations:'+payload.id, JSON.stringify(rec), true);
+    if(!w.synced){ toast('No se pudo crear el registro.'); return; }
+    await loadRegistrations();
+    openModal(payload.id);
+  };
+}
+
+/* Si ya ingresaste el código en esta pestaña, entra directo al recargar */
+(async function(){
+  let saved = null; try{ saved = sessionStorage.getItem('ciyPin'); }catch(e){}
+  if(!saved) return;
+  const ok = await window.storage.auth(saved);
+  if(ok === true){
+    document.getElementById('adminLoginCard').style.display = 'none';
+    document.getElementById('adminDashCard').style.display = 'block';
+    startAdminWatch();
+  }
+})();
+</script>
+</body>
+</html>
