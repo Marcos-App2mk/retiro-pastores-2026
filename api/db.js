@@ -1,7 +1,9 @@
 const { cmd } = require('./_kv');
 
-const ADMIN_PIN = process.env.ADMIN_PIN || '961271';
-const SCANNER_PIN = process.env.SCANNER_PIN || '2121';
+// Los PIN se configuran SOLO en Vercel (Settings → Environment Variables): ADMIN_PIN y SCANNER_PIN.
+// No hay PIN por defecto: si falta la variable, ese acceso queda bloqueado.
+const ADMIN_PIN = String(process.env.ADMIN_PIN || '').trim();
+const SCANNER_PIN = String(process.env.SCANNER_PIN || '').trim();
 // Si usas la misma base de datos para varios eventos, pon una variable EVENT_ID distinta en cada proyecto de Vercel
 // (por ejemplo: ciy2027, retiro2027). Cada evento queda separado. Si no la pones, funciona como siempre.
 const NS = process.env.EVENT_ID ? String(process.env.EVENT_ID).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40) + ':' : '';
@@ -15,12 +17,15 @@ module.exports = async (req, res) => {
   try{
     if(req.method !== 'POST') return res.status(405).json({ error:'method' });
     const { op, c, id, value, pin } = req.body || {};
-    const admin = pin === ADMIN_PIN;
+    const admin = !!ADMIN_PIN && typeof pin === 'string' && pin === ADMIN_PIN;
 
-    if(op === 'auth') return res.json({ ok: admin });
+    if(op === 'auth'){
+      if(!ADMIN_PIN) return res.status(500).json({ error:'Falta la variable ADMIN_PIN en Vercel (Settings → Environment Variables) y luego Redeploy.' });
+      return res.json({ ok: admin });
+    }
 
     // --- Escáner de comidas: acceso limitado (PIN propio o PIN de administrador) ---
-    const scanner = admin || pin === SCANNER_PIN;
+    const scanner = admin || (!!SCANNER_PIN && typeof pin === 'string' && pin === SCANNER_PIN);
     if(op === 'scan_auth') return res.json({ ok: scanner });
     if(op === 'counts' || op === 'scan'){
       if(!scanner) return res.status(403).json({ error:'scanner' });
