@@ -470,8 +470,8 @@ function populateMealSelect(){
   if(!sel || sel.options.length) return;
   { const o0=document.createElement('option'); o0.value='e'; o0.textContent='Registro / entrada al retiro'; sel.appendChild(o0); }
   MEALS.forEach((m,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=`Día ${m.dia} — ${m.tipo}`; sel.appendChild(o); });
-  try{ const v=localStorage.getItem('mealSel'); if(v!==null) sel.value=v; }catch(e){}
-  sel.onchange=()=>{ try{localStorage.setItem('mealSel',sel.value);}catch(e){} updateMealCounter(); };
+  sel.value = 'e';   // el escáner del administrador empieza siempre en "Registro / entrada" (no comparte la selección del escáner de comidas)
+  sel.onchange=()=>{ updateMealCounter(); };
 }
 document.addEventListener('DOMContentLoaded', populateMealSelect);
 
@@ -628,6 +628,7 @@ async function exportSpreadsheet(){
   }
 }
 
+let pendienteDesdeEscaneo = null;
 async function setEstado(id, estado, reopen, pago){
   try{
     const res = await window.storage.get('registrations:'+id, true);
@@ -637,8 +638,18 @@ async function setEstado(id, estado, reopen, pago){
     if(pago){ record.pago = pago; record.montoPagado = pagoInfo(record).pagado; }
     record.revisadoManualmente = true;
     record.fechaRevision = new Date().toISOString();
+    // Si se aprobó desde un escaneo de entrada, marcar la entrada en el mismo paso
+    let entradaMarcada = false;
+    if(estado === 'aprobado' && pendienteDesdeEscaneo === id && !(record.entradaEscaneada && record.entradaEscaneada.usado)){
+      record.entradaEscaneada = { usado:true, hora:new Date().toISOString() }; entradaMarcada = true;
+    }
+    if(pendienteDesdeEscaneo === id) pendienteDesdeEscaneo = null;
     const w = await window.storage.set('registrations:'+id, JSON.stringify(record), true);
     if(!w.synced) toast('No se pudo guardar el cambio en la base compartida.');
+    else if(entradaMarcada){
+      const p = pagoInfo(record);
+      showScanResult(p.clave === 'completo' ? 'ok' : 'deposit', 'Aprobado · entrada registrada', nombreConFamilia(record), p.clave === 'completo' ? (p.precio === 0 ? '✓ SIN COSTO' : '✓ PAGADO') : '⚠ DEBE ' + lempiras(p.saldo));
+    }
     else toast(estado === 'aprobado' ? 'Aprobado ✓ — ' + pagoInfo(record).texto : estado === 'rechazado' ? 'Rechazado' : 'Vuelto a pendiente');
   }catch(e){ toast('Error al guardar el cambio.'); }
   await loadRegistrations();
@@ -903,6 +914,8 @@ async function doDelete(id){
 
 /* ---------- Admin: camera QR scanner ---------- */
 function openScanner(){
+  populateMealSelect();
+  const sel = document.getElementById('mealSelect'); if(sel){ sel.value = 'e'; try{ updateMealCounter(); }catch(e){} }
   document.getElementById('adminListPanel').style.display = 'none';
   document.getElementById('scannerPanel').style.display = 'block';
   startScanner();
@@ -1058,6 +1071,8 @@ async function handleScannedPayload(text){
     return;
   }
   if(record.estado === 'pendiente'){
+    // Al aprobarlo en esta revisión, se marcará la entrada automáticamente (si se estaba registrando la entrada)
+    pendienteDesdeEscaneo = (document.getElementById('mealSelect') || {}).value === 'e' ? record.id : null;
     logScan('pending', `PENDIENTE de aprobación — ${record.nombreCompleto}. Abriendo revisión…`,{title:'Pendiente de aprobación', name:nombreConFamilia(record), sub:'Abriendo revisión…'});
     closeScanner();
     await loadRegistrations();
@@ -1088,6 +1103,11 @@ async function handleScannedPayload(text){
     const idx = parseInt(mode) || 0;
     const meal = MEALS[idx];
     const label = `${meal.tipo} (Día ${meal.dia})`;
+    // Comidas solo con pago completo
+    if(pg.clave !== 'completo'){
+      logScan('deposit', `${label} NO autorizado — ${record.nombreCompleto} · pago pendiente`,{title:'No servir · pago pendiente', name:nombreConFamilia(record), sub:(pg.clave === 'reserva' ? 'Debe ' + lempiras(pg.saldo) : 'Pago sin definir') + ' — pasar a la mesa de registro'});
+      return;
+    }
     if(record.comidas[idx] && record.comidas[idx].usado){
       logScan('fail', `${label} YA utilizado (${new Date(record.comidas[idx].hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:`D${meal.dia} ${meal.tipo}: ya usado`, name:nombreConFamilia(record), sub:'Usado a las ' + new Date(record.comidas[idx].hora).toLocaleTimeString()});
       return;

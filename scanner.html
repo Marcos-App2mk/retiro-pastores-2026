@@ -444,9 +444,9 @@ function enter(){
 function populateMealSelect(){
   const sel = document.getElementById('mealSelect'); if(sel.options.length) return;
   sel.innerHTML = MEALS.map((m,i)=>`<option value="${i}">Día ${m.dia} — ${esc(m.tipo)}</option>`).join('') ;
-  let saved = null; try{ saved = localStorage.getItem('mealSel'); }catch(e){}
+  let saved = null; try{ saved = localStorage.getItem('mealSelComidas'); }catch(e){}
   if(saved !== null && [...sel.options].some(o=>o.value===saved)) sel.value = saved;
-  sel.onchange = () => { try{ localStorage.setItem('mealSel', sel.value); }catch(e){} renderCounts(); };
+  sel.onchange = () => { try{ localStorage.setItem('mealSelComidas', sel.value); }catch(e){} renderCounts(); };
 }
 async function refreshCounts(){
   try{ counts = await call({ op:'counts' }); renderCounts(); }catch(e){}
@@ -605,6 +605,7 @@ async function handleScannedPayload(text){
   const sub = [payNote, alergia].filter(Boolean).join(' · ');
   if(j.status === 'ok'){ logScan(pg.clave === 'completo' ? 'ok' : 'deposit', `${label} válido — ${j.nombre} · ${payNote}`, {title:label, name:j.nombre, sub}); refreshCounts(); }
   else if(j.status === 'dup'){ const t = new Date(j.hora).toLocaleTimeString(); logScan('fail', `${label} YA utilizado (${t}) — ${j.nombre}`, {title:label + ': ya usado', name:j.nombre, sub:'Usado a las ' + t + ' · ' + payNote}); }
+  else if(j.status === 'unpaid') logScan('deposit', `${label} NO autorizado — ${j.nombre} · pago pendiente`, {title:'No servir · pago pendiente', name:j.nombre, sub:(pg.clave === 'reserva' ? 'Debe ' + lempiras(pg.saldo) : 'Pago sin definir') + ' — pasar a la mesa de registro'});
   else if(j.status === 'pending') logScan('pending', `PENDIENTE de aprobación — ${j.nombre}`, {title:'Pendiente de aprobación', name:j.nombre, sub:'Pásalo a la mesa de registro'});
   else if(j.status === 'rejected') logScan('fail', `RECHAZADO — ${j.nombre}`, {title:'Rechazado', name:j.nombre, sub:'No permitir el servicio'});
   else logScan('fail', 'Registro no encontrado.', {title:'Registro no encontrado'});
