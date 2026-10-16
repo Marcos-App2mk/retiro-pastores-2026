@@ -630,6 +630,7 @@ async function exportSpreadsheet(){
 
 let pendienteDesdeEscaneo = null;
 async function setEstado(id, estado, reopen, pago){
+  let cobrarDespues = null;
   try{
     const res = await window.storage.get('registrations:'+id, true);
     if(!res) { toast('Registro no encontrado.'); return; }
@@ -638,22 +639,63 @@ async function setEstado(id, estado, reopen, pago){
     if(pago){ record.pago = pago; record.montoPagado = pagoInfo(record).pagado; }
     record.revisadoManualmente = true;
     record.fechaRevision = new Date().toISOString();
-    // Si se aprobó desde un escaneo de entrada, marcar la entrada en el mismo paso
+    // Aprobado desde un escaneo en la mesa de registro:
+    //  - pago completo → se registra la entrada en el mismo paso
+    //  - solo depósito → NO se registra la entrada; se pasa a "Cobrar saldo"
     let entradaMarcada = false;
-    if(estado === 'aprobado' && pendienteDesdeEscaneo === id && !(record.entradaEscaneada && record.entradaEscaneada.usado)){
-      record.entradaEscaneada = { usado:true, hora:new Date().toISOString() }; entradaMarcada = true;
-    }
+    const desdeEscaneo = estado === 'aprobado' && pendienteDesdeEscaneo === id;
     if(pendienteDesdeEscaneo === id) pendienteDesdeEscaneo = null;
+    if(desdeEscaneo){
+      if(pagoInfo(record).clave === 'completo'){
+        if(!(record.entradaEscaneada && record.entradaEscaneada.usado)){ record.entradaEscaneada = { usado:true, hora:new Date().toISOString() }; entradaMarcada = true; }
+      } else cobrarDespues = record;
+    }
     const w = await window.storage.set('registrations:'+id, JSON.stringify(record), true);
-    if(!w.synced) toast('No se pudo guardar el cambio en la base compartida.');
+    if(!w.synced){ toast('No se pudo guardar el cambio en la base compartida.'); cobrarDespues = null; }
     else if(entradaMarcada){
       const p = pagoInfo(record);
-      showScanResult(p.clave === 'completo' ? 'ok' : 'deposit', 'Aprobado · entrada registrada', nombreConFamilia(record), p.clave === 'completo' ? (p.precio === 0 ? '✓ SIN COSTO' : '✓ PAGADO') : '⚠ DEBE ' + lempiras(p.saldo));
+      showScanResult('ok', 'Aprobado · entrada registrada', nombreConFamilia(record), p.precio === 0 ? '✓ SIN COSTO' : '✓ PAGADO');
     }
     else toast(estado === 'aprobado' ? 'Aprobado ✓ — ' + pagoInfo(record).texto : estado === 'rechazado' ? 'Rechazado' : 'Vuelto a pendiente');
   }catch(e){ toast('Error al guardar el cambio.'); }
   await loadRegistrations();
+  if(cobrarDespues){ openCobro(cobrarDespues); return; }
   if(reopen) openDatos(id);
+}
+
+/* ---------- Mesa de registro: cobrar el saldo y registrar la entrada en un solo paso ---------- */
+function openCobro(r){
+  const p = pagoInfo(r);
+  document.getElementById('modalContent').innerHTML = `
+    <h2>Cobrar saldo</h2>
+    <div class="pay-banner reserva" style="margin:10px 0;">⚠ DEBE ${lempiras(p.saldo)} — entrada NO registrada todavía</div>
+    <p style="font-size:18px;margin:6px 0 2px;"><b>${esc(r.nombreCompleto)}</b></p>
+    ${r.familia ? `<p class="hint" style="margin:0 0 8px;">${esc(familiaTexto(r))}</p>` : ''}
+    <table class="datos">
+      <tr><td>Total</td><td>${lempiras(p.precio)}</td></tr>
+      <tr><td>Ya pagó (depósito)</td><td>${lempiras(p.pagado)}</td></tr>
+      <tr><td><b>Saldo a cobrar</b></td><td><b>${lempiras(p.saldo)}</b></td></tr>
+    </table>
+    ${r.tieneAlergias ? `<div class="allergy-alert">⚠️ ALERGIAS<br><b>${esc(r.alergias || 'Sin detalle')}</b></div>` : ''}
+    <div class="row-actions" style="margin-top:14px;flex-direction:column;gap:10px;">
+      <button class="primary" style="background:var(--ok);padding:14px;font-size:17px;" onclick="cobrarYEntrar('${esc(r.id)}')">💰 Recibí ${lempiras(p.saldo)} · registrar entrada</button>
+      <button class="ghost" onclick="closeModal()">Todavía no paga (no registrar entrada)</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+async function cobrarYEntrar(id){
+  try{
+    const res = await window.storage.get('registrations:'+id, true);
+    if(!res){ toast('Registro no encontrado.'); return; }
+    const rec = JSON.parse(res.value);
+    rec.pago = 'completo'; rec.montoPagado = pagoInfo(rec).pagado; rec.fechaPago = new Date().toISOString();
+    if(!(rec.entradaEscaneada && rec.entradaEscaneada.usado)) rec.entradaEscaneada = { usado:true, hora:new Date().toISOString() };
+    const w = await window.storage.set('registrations:'+id, JSON.stringify(rec), true);
+    if(!w.synced){ toast('No se pudo guardar. Intenta de nuevo.'); return; }
+    closeModal();
+    showScanResult('ok', 'Pagado · entrada registrada', nombreConFamilia(rec), '✓ PAGADO' + (rec.tieneAlergias ? ' · ⚠ ALERGIAS: ' + rec.alergias : ''));
+  }catch(e){ toast('Error al guardar.'); }
+  await loadRegistrations();
 }
 
 function openModal(id){ openDatos(id); }
@@ -1093,6 +1135,13 @@ async function handleScannedPayload(text){
   if(mode === 'e'){
     if(record.entradaEscaneada && record.entradaEscaneada.usado){
       logScan('fail', `Entrada YA registrada (${new Date(record.entradaEscaneada.hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:'Registro: ya usado', name:nombreConFamilia(record), sub:'Registrado a las ' + new Date(record.entradaEscaneada.hora).toLocaleTimeString()});
+      return;
+    }
+    if(pg.clave !== 'completo'){
+      // Reserva aprobada pero debe saldo: NO se registra la entrada hasta cobrar
+      logScan('deposit', `Debe ${lempiras(pg.saldo)} — ${record.nombreCompleto}. Entrada NO registrada.`,{title:'Cobrar saldo', name:nombreConFamilia(record), sub:'Debe ' + lempiras(pg.saldo) + ' · entrada no registrada'});
+      closeScanner();
+      openCobro(record);
       return;
     }
     record.entradaEscaneada = { usado:true, hora:new Date().toISOString() };

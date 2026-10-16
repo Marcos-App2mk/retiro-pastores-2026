@@ -58,7 +58,8 @@ module.exports = async (req, res) => {
       if(rec.estado !== 'aprobado') return res.json(Object.assign({ status:'rejected' }, info));
       if(mode !== 'e'){ rec.comidas = rec.comidas || []; while(rec.comidas.length <= +mode) rec.comidas.push({ usado:false, hora:null }); }
       // Comidas solo con pago completo (el administrador marca "Pago completo" al recibir el saldo)
-      if(mode !== 'e' && rec.pago !== 'completo') return res.json(Object.assign({ status:'unpaid' }, info));
+      // La entrada y las comidas solo con pago completo (la entrada con saldo se cobra en la mesa de registro)
+      if(rec.pago !== 'completo') return res.json(Object.assign({ status:'unpaid' }, info));
       const slot = mode === 'e' ? rec.entradaEscaneada : rec.comidas[+mode];
       if(slot && slot.usado) return res.json(Object.assign({ status:'dup', hora: slot.hora }, info));
       const nuevo = { usado:true, hora: new Date().toISOString() };
