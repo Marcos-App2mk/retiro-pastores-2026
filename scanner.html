@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>Retiro de Pastores — Escáner de comidas</title>
+<title>Campamento CIY — Escáner de comidas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Karla:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 <script src="config.js"></script>
@@ -25,19 +25,19 @@ window.jsqrReady = new Promise(function(resolve){
 </script>
 <style>
   :root{
-    --pine:#1E4A32;
-    --pine-dark:#11301F;
-    --moss:#3D7354;
-    --parchment:#0C2117;
-    --cream:#F7FAF4;
-    --ember:#2B7A4B;
-    --ember-dark:#1F5C38;
-    --wood:#3F5E4B;
+    --pine:#33495A;
+    --pine-dark:#243441;
+    --moss:#4F7184;
+    --parchment:#1C2832;
+    --cream:#F5F8FA;
+    --ember:#BF8A22;
+    --ember-dark:#A5741B;
+    --wood:#506476;
     --gold:#E8B23D;
-    --ink:#26231C;
-    --line:#CFDDCF;
+    --ink:#1F2A33;
+    --line:#C8D3DB;
     --bad:#B23A32;
-    --ok:#2B7A4B;
+    --ok:#3E7A66;
     --warn:#C68A1F;
   }
   *{box-sizing:border-box;}
@@ -71,7 +71,7 @@ window.jsqrReady = new Promise(function(resolve){
     position:relative;
     height:150px;
     overflow:hidden;
-    background:var(--parchment);
+    background:#000;
     padding:0 28px;
   }
   .reflection-pool::before{
@@ -86,7 +86,7 @@ window.jsqrReady = new Promise(function(resolve){
     -webkit-mask-image:linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0) 88%);
     mask-image:linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0) 88%);
   }
-  .reflection-pool svg.ridge{ display:block; position:absolute; bottom:-1px; left:0; width:100%; height:30px; fill:var(--parchment); z-index:2; }
+  .reflection-pool svg.ridge{ display:block; position:absolute; bottom:-1px; left:0; width:100%; height:30px; fill:#000; z-index:2; }
   .reflection-pool .sub-reflect{
     position:relative; z-index:3;
     margin:0; padding-top:22px;
@@ -99,13 +99,10 @@ window.jsqrReady = new Promise(function(resolve){
   }
   .corner-badge{
     position:absolute; top:16px; right:16px; z-index:3;
-    background:#EAE7DC; border-radius:12px; padding:9px;
+    background:#E4EAEE; border-radius:12px; padding:9px;
     box-shadow:0 4px 12px rgba(0,0,0,0.35);
   }
   .corner-badge img{ width:52px; height:52px; display:block; }
-  /* Logo del retiro: abajo a la izquierda, más pequeño (logo horizontal) */
-  .corner-badge{ top:auto; right:auto; bottom:12px; left:12px; padding:5px 7px; border-radius:8px; background:#fff; }
-  .corner-badge img{ width:auto; height:26px; }
   .brand-center{ position:relative; z-index:2; }
   .brand-center .logo-img{
     width:88px; height:88px; display:block; margin:0 auto 12px;
@@ -113,7 +110,7 @@ window.jsqrReady = new Promise(function(resolve){
   }
   .brand-center .kicker{ color:var(--gold); font-size:13px; margin:0 0 2px; letter-spacing:0.5px; text-shadow:0 2px 8px rgba(0,0,0,0.6); }
   .brand-center h1{ font-size:32px; line-height:1.1; letter-spacing:1px; text-shadow:0 2px 10px rgba(0,0,0,0.7); }
-  header.topo p.sub{ margin:14px auto 0; max-width:42ch; color:#EDEBDD; font-size:15px; position:relative; z-index:2; text-shadow:0 2px 8px rgba(0,0,0,0.7); }
+  header.topo p.sub{ margin:14px auto 0; max-width:42ch; color:#E8EEF2; font-size:15px; position:relative; z-index:2; text-shadow:0 2px 8px rgba(0,0,0,0.7); }
 
   .mode-tabs{
     display:flex; gap:8px; padding:16px 22px 0;
@@ -132,11 +129,11 @@ window.jsqrReady = new Promise(function(resolve){
     background:var(--cream); border:2px solid var(--line); color:var(--wood);
     font-family:'Archivo Black',sans-serif; font-size:14px; transition:all .2s ease;
   }
-  .trail .marker.active::before{ background:var(--ember); border-color:var(--ember-dark); color:#fff; }
+  .trail .marker.active::before{ background:var(--ember); border-color:var(--ember-dark); color:#2A2100; }
   .trail .marker.done::before{ content:"✓"; background:var(--moss); border-color:var(--moss); color:#fff; }
-  .trail .marker span{ font-size:12px; color:#D8CBB8; }
+  .trail .marker span{ font-size:12px; color:#C3D0DA; }
   .trail .marker.active span{ color:var(--gold); font-weight:700; }
-  .trail .marker.done span{ color:#B9C9BB; }
+  .trail .marker.done span{ color:#B5C9D6; }
 
   main{ padding:0 22px; }
   .card{ background:var(--cream); border:1px solid var(--line); border-radius:6px; padding:26px 24px; }
@@ -180,14 +177,14 @@ window.jsqrReady = new Promise(function(resolve){
   .nav-buttons{ display:flex; justify-content:space-between; margin-top:26px; gap:12px; }
   button{ font-family:'Karla',sans-serif; font-weight:700; font-size:15px; border-radius:4px; padding:12px 20px; border:none; cursor:pointer; transition:transform .08s ease, background .15s ease; }
   button:active{ transform:translateY(1px); }
-  button.primary{ background:var(--ember); color:#fff; }
+  button.primary{ background:var(--ember); color:#2A2100; }
   button.primary:hover{ background:var(--ember-dark); }
-  button.primary:disabled{ background:#CBBFA0; color:#8a8067; cursor:not-allowed; }
+  button.primary:disabled{ background:#B4C0C9; color:#6B7A86; cursor:not-allowed; }
   button.ghost{ background:transparent; color:var(--wood); border:1.5px solid var(--line); }
   button.ghost:hover{ border-color:var(--wood); }
   button.small{ padding:8px 12px; font-size:13px; }
 
-  .upload-box{ border:2px dashed var(--line); border-radius:6px; padding:22px; text-align:center; background:#fffef9; cursor:pointer; }
+  .upload-box{ border:2px dashed var(--line); border-radius:6px; padding:22px; text-align:center; background:#FBFDFE; cursor:pointer; }
   .upload-box:hover{ border-color:var(--ember); }
   .upload-box img{ max-width:100%; max-height:220px; border-radius:4px; margin-top:12px; }
   .upload-box .placeholder{ color:var(--wood); font-size:14px; }
@@ -195,7 +192,7 @@ window.jsqrReady = new Promise(function(resolve){
 
   .verify-row{ display:flex; gap:12px; align-items:center; margin-top:14px; flex-wrap:wrap; }
   .result-box{ margin-top:16px; padding:14px 16px; border-radius:5px; font-size:14px; display:none; }
-  .result-box.ok{ background:#E6F0E6; border:1px solid var(--moss); color:#254a30; display:block; }
+  .result-box.ok{ background:#E3F0EC; border:1px solid var(--moss); color:#25483C; display:block; }
   .result-box.fail{ background:#F8E3DC; border:1px solid var(--ember); color:#7A2E17; display:block; }
   .result-box.working{ background:#FBF3DD; border:1px solid var(--gold); color:#6a4f10; display:block; }
   .result-box strong{ display:block; margin-bottom:4px; }
@@ -212,7 +209,7 @@ window.jsqrReady = new Promise(function(resolve){
   .ticket .qr-holder{ flex:0 0 auto; background:#fff; padding:8px; border-radius:4px; border:1px solid var(--line); }
   .ticket .info h3{ font-size:16px; color:var(--pine-dark); margin-bottom:4px; }
   .ticket .info p{ margin:2px 0; font-size:13px; color:var(--wood); }
-  .ticket .info .id-code{ font-family:monospace; font-size:12px; background:#F0E9D2; padding:2px 6px; border-radius:3px; }
+  .ticket .info .id-code{ font-family:monospace; font-size:12px; background:#E8EEF2; padding:2px 6px; border-radius:3px; }
 
   .meals-title{ font-size:16px; color:var(--pine-dark); margin:22px 0 12px; }
   .meals-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
@@ -229,7 +226,7 @@ window.jsqrReady = new Promise(function(resolve){
   .confirm-actions{ display:flex; gap:12px; justify-content:center; margin-top:26px; flex-wrap:wrap; }
 
   .pending-box{ text-align:center; padding:30px 20px; }
-  .pending-box .id-big{ font-family:monospace; font-size:20px; background:#F0E9D2; padding:10px 16px; border-radius:5px; display:inline-block; margin:14px 0; letter-spacing:1px; }
+  .pending-box .id-big{ font-family:monospace; font-size:20px; background:#E8EEF2; padding:10px 16px; border-radius:5px; display:inline-block; margin:14px 0; letter-spacing:1px; }
 
   footer.foot{
     text-align:center; color:var(--ink); font-size:16px; font-weight:700; line-height:1.45;
@@ -278,7 +275,7 @@ window.jsqrReady = new Promise(function(resolve){
   .camper-row h3{ font-size:15px; color:var(--pine-dark); margin-bottom:2px; }
   .camper-row p{ margin:2px 0; font-size:13px; color:var(--wood); }
   .badge{ font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap; }
-  .badge.aprobado{ background:#E6F0E6; color:var(--ok); }
+  .badge.aprobado{ background:#E3F0EC; color:var(--ok); }
   .badge.pendiente{ background:#FBF0DA; color:var(--warn); }
   .badge.rechazado{ background:#F8E3DC; color:var(--bad); }
   .camper-row .thumb{ width:54px; height:54px; object-fit:cover; border-radius:4px; border:1px solid var(--line); cursor:pointer; }
@@ -286,18 +283,18 @@ window.jsqrReady = new Promise(function(resolve){
   .camper-row .row-actions button{ flex:1; min-width:90px; }
   .tick-status{ font-size:12px; color:var(--wood); margin-top:6px; }
 
-  .modal-overlay{ position:fixed; inset:0; background:rgba(21,42,32,0.82); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal-overlay{ position:fixed; inset:0; background:rgba(28,40,50,0.82); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
   .modal-overlay.active{ display:flex; }
   .modal-box{ background:var(--cream); border-radius:8px; padding:20px; max-width:440px; width:100%; max-height:88vh; overflow:auto; }
   .modal-box img{ width:100%; border-radius:5px; margin:12px 0; border:1px solid var(--line); }
-  .modal-box .ai-note{ font-size:13px; background:#F0EADA; padding:10px 12px; border-radius:5px; margin-bottom:10px; }
+  .modal-box .ai-note{ font-size:13px; background:#E8EEF2; padding:10px 12px; border-radius:5px; margin-bottom:10px; }
   .modal-close{ display:flex; justify-content:flex-end; }
 
   .scanner-panel{ text-align:center; }
   .scanner-panel video{ width:100%; max-width:360px; border-radius:8px; background:#000; }
   .scan-status{ margin:16px auto; padding:14px; border-radius:6px; font-weight:700; font-size:15px; max-width:360px; }
-  .scan-status.idle{ background:#F0EADA; color:var(--wood); }
-  .scan-status.ok{ background:#E6F0E6; color:var(--ok); }
+  .scan-status.idle{ background:#E8EEF2; color:var(--wood); }
+  .scan-status.ok{ background:#E3F0EC; color:var(--ok); }
   .scan-status.fail{ background:#F8E3DC; color:var(--bad); }
   .scan-status.warn{ background:#FBF0DA; color:var(--warn); }
   .scan-log{ text-align:left; max-width:360px; margin:0 auto; font-size:12px; color:var(--wood); max-height:140px; overflow:auto; }
@@ -314,13 +311,13 @@ window.jsqrReady = new Promise(function(resolve){
     .ticket, .stub{ break-inside:avoid; }
   }
 
-  header.topo.admin-head{ background:linear-gradient(rgba(12,33,23,.72),rgba(12,33,23,.88)), var(--theme-img) center 40% / cover no-repeat; aspect-ratio:auto; min-height:0; padding:26px 16px 22px; }
+  header.topo.admin-head{ background:#000; aspect-ratio:auto; min-height:0; padding:26px 16px 22px; }
   header.topo.admin-head h1{ color:var(--gold); font-size:26px; margin:0; }
   header.topo.admin-head p{ margin:4px 0 0; color:var(--cream); font-size:15px; }
   .admin-nav{ padding:14px 22px 0; }
   .admin-nav a{ color:var(--gold); font-weight:700; text-decoration:none; }
 
-  .meal-counter{ font-weight:700; font-size:14px; color:var(--pine-dark); background:#E6F0E6; border-radius:6px; padding:8px 12px; margin-bottom:10px; text-align:center; }
+  .meal-counter{ font-weight:700; font-size:14px; color:var(--pine-dark); background:#E3F0EC; border-radius:6px; padding:8px 12px; margin-bottom:10px; text-align:center; }
   details.tally{ background:var(--cream); border:1px solid var(--line); border-radius:6px; margin-bottom:18px; }
   details.tally > summary{ cursor:pointer; padding:12px 14px; font-weight:700; color:var(--pine-dark); }
   details.tally > summary small{ font-weight:400; color:var(--wood); }
@@ -329,11 +326,11 @@ window.jsqrReady = new Promise(function(resolve){
   .tally-table th{ text-align:left; font-size:11px; letter-spacing:.5px; text-transform:uppercase; color:var(--wood); padding:6px 8px; border-bottom:2px solid var(--line); }
   .tally-table td{ padding:7px 8px; border-bottom:1px solid var(--line); }
   .tally-table td.n, .tally-table th.n{ text-align:right; font-variant-numeric:tabular-nums; }
-  .tally-table tr.total td{ font-weight:800; border-top:2px solid var(--pine-dark); border-bottom:none; background:#F0E9D2; }
+  .tally-table tr.total td{ font-weight:800; border-top:2px solid var(--pine-dark); border-bottom:none; background:#E8EEF2; }
   .tally-h{ font-size:13px; color:var(--pine-dark); margin:12px 0 0; font-family:'Karla',sans-serif; font-weight:800; }
   .meal-chips{ display:flex; flex-wrap:wrap; gap:4px; margin:6px 0 2px; }
   .meal-chips span{ font-size:11px; padding:3px 8px; border-radius:12px; background:#EDE7D6; color:var(--wood); }
-  .meal-chips span.used{ background:#E6F0E6; color:var(--ok); font-weight:700; }
+  .meal-chips span.used{ background:#E3F0EC; color:var(--ok); font-weight:700; }
   table.datos{ width:100%; border-collapse:collapse; font-size:14px; margin:8px 0; }
   table.datos td{ padding:6px 4px; border-bottom:1px solid var(--line); vertical-align:top; }
   table.datos td:first-child{ color:var(--wood); width:38%; font-size:12px; text-transform:uppercase; letter-spacing:.4px; }
@@ -341,7 +338,7 @@ window.jsqrReady = new Promise(function(resolve){
   .datos-qr .qr-frame{ display:inline-block; background:#fff; padding:10px; border-radius:10px; border:1px solid var(--line); line-height:0; }
   .datos-qr .qr-frame canvas, .datos-qr .qr-frame img{ display:block; }
 
-  .big-scan{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; width:100%; min-height:110px; margin:0 0 12px; border:none; border-radius:12px; background:var(--ember); color:#fff; font-family:'Karla',sans-serif; font-size:26px; font-weight:800; letter-spacing:.3px; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25); }
+  .big-scan{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; width:50%; min-width:150px; min-height:84px; margin:0 auto 12px; border:none; border-radius:12px; background:var(--ember); color:#2A2100; font-family:'Karla',sans-serif; font-size:26px; font-weight:800; letter-spacing:.3px; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25); }
   .big-scan:active{ transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,.25); }
   .big-scan .ico{ font-size:38px; line-height:1; }
   .big-scan small{ font-size:13px; font-weight:600; opacity:.9; letter-spacing:.2px; }
@@ -351,7 +348,7 @@ window.jsqrReady = new Promise(function(resolve){
   .scan-wrap{ position:relative; max-width:420px; margin:0 auto; }
   .scan-wrap video{ width:100%; max-width:none !important; height:min(62vh,460px); object-fit:cover; display:block; }
   .scan-frame{ position:absolute; left:50%; top:50%; width:68%; aspect-ratio:1/1; transform:translate(-50%,-50%); border:3px solid rgba(255,255,255,.9); border-radius:14px; box-shadow:0 0 0 999px rgba(0,0,0,.28); pointer-events:none; }
-  .photo-btn{ display:block; width:100%; box-sizing:border-box; text-align:center; padding:20px 12px; border-radius:10px; cursor:pointer; background:var(--ember); color:#fff; font-size:20px; font-weight:800; margin:0 0 10px; }
+  .photo-btn{ display:block; width:100%; box-sizing:border-box; text-align:center; padding:20px 12px; border-radius:10px; cursor:pointer; background:var(--ember); color:#2A2100; font-size:20px; font-weight:800; margin:0 0 10px; }
   .scan-tip{ font-size:12px; color:var(--wood); margin:6px auto 0; max-width:360px; }
 
   .scan-result{ position:fixed; inset:0; z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; color:#fff; cursor:pointer; }
@@ -374,7 +371,7 @@ window.jsqrReady = new Promise(function(resolve){
 <div class="app">
   <header class="topo admin-head">
     <div class="corner-badge"><img class="logo-img" src="assets/logo.png" data-ev-img="logo" alt="Logo"></div>
-    <h1 data-ev="nombre">Retiro de Pastores</h1>
+    <h1 data-ev="nombre">Campamento CIY</h1>
     <p>Escáner de comidas</p>
   </header>
   <div class="admin-nav"><a href="./">← Volver al registro</a></div>
@@ -592,18 +589,16 @@ function logScan(kind, msg, res){
 async function handleScannedPayload(text){
   let payload;
   try{ payload = JSON.parse(text); }catch(e){ logScan('fail','Código QR no reconocido.',{title:'QR no reconocido'}); return; }
-  if(!payload.id){ logScan('fail','Código QR no pertenece a este retiro.',{title:'QR de otro evento'}); return; }
+  if(!payload.id){ logScan('fail','Código QR no pertenece a este campamento.',{title:'QR de otro evento'}); return; }
   const mode = document.getElementById('mealSelect').value;
   const label = mode === 'e' ? 'Registro / entrada' : `D${MEALS[+mode].dia} ${MEALS[+mode].tipo}`;
   let j;
   try{ j = await call({ op:'scan', id:payload.id, mode }); }
   catch(e){ logScan('fail','No se pudo guardar. Revisa tu internet e intenta de nuevo.',{title:'No se guardó', sub:'Intenta de nuevo'}); return; }
   const alergia = j.alergias ? '⚠ ALERGIAS: ' + j.alergias : '';
-    const pg = pagoInfo({ pago: j.pago, fechaNacimiento: j.fn || '', familia: j.familia || undefined, estado: 'aprobado' });
-    if(j.personas > 1) j.nombre = j.nombre + ' · ' + j.personas + ' PLATOS';
-    const payNote = pg.clave === 'completo' ? (pg.precio === 0 ? '✓ SIN COSTO' : '✓ PAGADO') : pg.clave === 'reserva' ? '⚠ DEBE ' + lempiras(pg.saldo) + ' (solo reserva)' : '⚠ PAGO SIN DEFINIR';
+    const payNote = j.pago === 'completo' ? '✓ PAGADO' : j.pago === 'reserva' ? '⚠ DEBE ' + lempiras(PRECIO_TOTAL - PRECIO_RESERVA) + ' (solo reserva)' : '⚠ PAGO SIN DEFINIR';
   const sub = [payNote, alergia].filter(Boolean).join(' · ');
-  if(j.status === 'ok'){ logScan(pg.clave === 'completo' ? 'ok' : 'deposit', `${label} válido — ${j.nombre} · ${payNote}`, {title:label, name:j.nombre, sub}); refreshCounts(); }
+  if(j.status === 'ok'){ logScan(j.pago === 'completo' ? 'ok' : 'deposit', `${label} válido — ${j.nombre} · ${payNote}`, {title:label, name:j.nombre, sub}); refreshCounts(); }
   else if(j.status === 'dup'){ const t = new Date(j.hora).toLocaleTimeString(); logScan('fail', `${label} YA utilizado (${t}) — ${j.nombre}`, {title:label + ': ya usado', name:j.nombre, sub:'Usado a las ' + t + ' · ' + payNote}); }
   else if(j.status === 'pending') logScan('pending', `PENDIENTE de aprobación — ${j.nombre}`, {title:'Pendiente de aprobación', name:j.nombre, sub:'Pásalo a la mesa de registro'});
   else if(j.status === 'rejected') logScan('fail', `RECHAZADO — ${j.nombre}`, {title:'Rechazado', name:j.nombre, sub:'No permitir el servicio'});

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex">
-<title>Retiro de Pastores — Administración</title>
+<title>Campamento CIY — Administración</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Karla:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 <script src="config.js"></script>
@@ -27,19 +27,19 @@ window.jsqrReady = new Promise(function(resolve){
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
-    --pine:#1E4A32;
-    --pine-dark:#11301F;
-    --moss:#3D7354;
-    --parchment:#0C2117;
-    --cream:#F7FAF4;
-    --ember:#2B7A4B;
-    --ember-dark:#1F5C38;
-    --wood:#3F5E4B;
+    --pine:#33495A;
+    --pine-dark:#243441;
+    --moss:#4F7184;
+    --parchment:#1C2832;
+    --cream:#F5F8FA;
+    --ember:#BF8A22;
+    --ember-dark:#A5741B;
+    --wood:#38495A;
     --gold:#E8B23D;
-    --ink:#26231C;
-    --line:#CFDDCF;
+    --ink:#1F2A33;
+    --line:#C8D3DB;
     --bad:#B23A32;
-    --ok:#2B7A4B;
+    --ok:#3E7A66;
     --warn:#C68A1F;
   }
   *{box-sizing:border-box;}
@@ -73,7 +73,7 @@ window.jsqrReady = new Promise(function(resolve){
     position:relative;
     height:150px;
     overflow:hidden;
-    background:var(--parchment);
+    background:#000;
     padding:0 28px;
   }
   .reflection-pool::before{
@@ -88,7 +88,7 @@ window.jsqrReady = new Promise(function(resolve){
     -webkit-mask-image:linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0) 88%);
     mask-image:linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0) 88%);
   }
-  .reflection-pool svg.ridge{ display:block; position:absolute; bottom:-1px; left:0; width:100%; height:30px; fill:var(--parchment); z-index:2; }
+  .reflection-pool svg.ridge{ display:block; position:absolute; bottom:-1px; left:0; width:100%; height:30px; fill:#000; z-index:2; }
   .reflection-pool .sub-reflect{
     position:relative; z-index:3;
     margin:0; padding-top:22px;
@@ -101,13 +101,10 @@ window.jsqrReady = new Promise(function(resolve){
   }
   .corner-badge{
     position:absolute; top:16px; right:16px; z-index:3;
-    background:#EAE7DC; border-radius:12px; padding:9px;
+    background:#E4EAEE; border-radius:12px; padding:9px;
     box-shadow:0 4px 12px rgba(0,0,0,0.35);
   }
   .corner-badge img{ width:52px; height:52px; display:block; }
-  /* Logo del retiro: abajo a la izquierda, más pequeño (logo horizontal) */
-  .corner-badge{ top:auto; right:auto; bottom:12px; left:12px; padding:5px 7px; border-radius:8px; background:#fff; }
-  .corner-badge img{ width:auto; height:26px; }
   .brand-center{ position:relative; z-index:2; }
   .brand-center .logo-img{
     width:88px; height:88px; display:block; margin:0 auto 12px;
@@ -115,7 +112,7 @@ window.jsqrReady = new Promise(function(resolve){
   }
   .brand-center .kicker{ color:var(--gold); font-size:13px; margin:0 0 2px; letter-spacing:0.5px; text-shadow:0 2px 8px rgba(0,0,0,0.6); }
   .brand-center h1{ font-size:32px; line-height:1.1; letter-spacing:1px; text-shadow:0 2px 10px rgba(0,0,0,0.7); }
-  header.topo p.sub{ margin:14px auto 0; max-width:42ch; color:#EDEBDD; font-size:15px; position:relative; z-index:2; text-shadow:0 2px 8px rgba(0,0,0,0.7); }
+  header.topo p.sub{ margin:14px auto 0; max-width:42ch; color:#E8EEF2; font-size:15px; position:relative; z-index:2; text-shadow:0 2px 8px rgba(0,0,0,0.7); }
 
   .mode-tabs{
     display:flex; gap:8px; padding:16px 22px 0;
@@ -134,11 +131,11 @@ window.jsqrReady = new Promise(function(resolve){
     background:var(--cream); border:2px solid var(--line); color:var(--wood);
     font-family:'Archivo Black',sans-serif; font-size:14px; transition:all .2s ease;
   }
-  .trail .marker.active::before{ background:var(--ember); border-color:var(--ember-dark); color:#fff; }
+  .trail .marker.active::before{ background:var(--ember); border-color:var(--ember-dark); color:#2A2100; }
   .trail .marker.done::before{ content:"✓"; background:var(--moss); border-color:var(--moss); color:#fff; }
-  .trail .marker span{ font-size:12px; color:#D8CBB8; }
+  .trail .marker span{ font-size:12px; color:#C3D0DA; }
   .trail .marker.active span{ color:var(--gold); font-weight:700; }
-  .trail .marker.done span{ color:#B9C9BB; }
+  .trail .marker.done span{ color:#B5C9D6; }
 
   main{ padding:0 22px; }
   .card{ background:var(--cream); border:1px solid var(--line); border-radius:6px; padding:26px 24px; }
@@ -182,14 +179,14 @@ window.jsqrReady = new Promise(function(resolve){
   .nav-buttons{ display:flex; justify-content:space-between; margin-top:26px; gap:12px; }
   button{ font-family:'Karla',sans-serif; font-weight:700; font-size:15px; border-radius:4px; padding:12px 20px; border:none; cursor:pointer; transition:transform .08s ease, background .15s ease; }
   button:active{ transform:translateY(1px); }
-  button.primary{ background:var(--ember); color:#fff; }
+  button.primary{ background:var(--ember); color:#2A2100; }
   button.primary:hover{ background:var(--ember-dark); }
-  button.primary:disabled{ background:#CBBFA0; color:#8a8067; cursor:not-allowed; }
-  button.ghost{ background:transparent; color:var(--wood); border:1.5px solid var(--line); }
+  button.primary:disabled{ background:#B4C0C9; color:#6B7A86; cursor:not-allowed; }
+  button.ghost{ background:transparent; color:var(--wood); border:1.5px solid #AEBDC9; }
   button.ghost:hover{ border-color:var(--wood); }
   button.small{ padding:8px 12px; font-size:13px; }
 
-  .upload-box{ border:2px dashed var(--line); border-radius:6px; padding:22px; text-align:center; background:#fffef9; cursor:pointer; }
+  .upload-box{ border:2px dashed var(--line); border-radius:6px; padding:22px; text-align:center; background:#FBFDFE; cursor:pointer; }
   .upload-box:hover{ border-color:var(--ember); }
   .upload-box img{ max-width:100%; max-height:220px; border-radius:4px; margin-top:12px; }
   .upload-box .placeholder{ color:var(--wood); font-size:14px; }
@@ -197,7 +194,7 @@ window.jsqrReady = new Promise(function(resolve){
 
   .verify-row{ display:flex; gap:12px; align-items:center; margin-top:14px; flex-wrap:wrap; }
   .result-box{ margin-top:16px; padding:14px 16px; border-radius:5px; font-size:14px; display:none; }
-  .result-box.ok{ background:#E6F0E6; border:1px solid var(--moss); color:#254a30; display:block; }
+  .result-box.ok{ background:#E3F0EC; border:1px solid var(--moss); color:#25483C; display:block; }
   .result-box.fail{ background:#F8E3DC; border:1px solid var(--ember); color:#7A2E17; display:block; }
   .result-box.working{ background:#FBF3DD; border:1px solid var(--gold); color:#6a4f10; display:block; }
   .result-box strong{ display:block; margin-bottom:4px; }
@@ -214,7 +211,7 @@ window.jsqrReady = new Promise(function(resolve){
   .ticket .qr-holder{ flex:0 0 auto; background:#fff; padding:8px; border-radius:4px; border:1px solid var(--line); }
   .ticket .info h3{ font-size:16px; color:var(--pine-dark); margin-bottom:4px; }
   .ticket .info p{ margin:2px 0; font-size:13px; color:var(--wood); }
-  .ticket .info .id-code{ font-family:monospace; font-size:12px; background:#F0E9D2; padding:2px 6px; border-radius:3px; }
+  .ticket .info .id-code{ font-family:monospace; font-size:12px; background:#E8EEF2; padding:2px 6px; border-radius:3px; }
 
   .meals-title{ font-size:16px; color:var(--pine-dark); margin:22px 0 12px; }
   .meals-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
@@ -231,7 +228,7 @@ window.jsqrReady = new Promise(function(resolve){
   .confirm-actions{ display:flex; gap:12px; justify-content:center; margin-top:26px; flex-wrap:wrap; }
 
   .pending-box{ text-align:center; padding:30px 20px; }
-  .pending-box .id-big{ font-family:monospace; font-size:20px; background:#F0E9D2; padding:10px 16px; border-radius:5px; display:inline-block; margin:14px 0; letter-spacing:1px; }
+  .pending-box .id-big{ font-family:monospace; font-size:20px; background:#E8EEF2; padding:10px 16px; border-radius:5px; display:inline-block; margin:14px 0; letter-spacing:1px; }
 
   footer.foot{
     text-align:center; color:var(--ink); font-size:16px; font-weight:700; line-height:1.45;
@@ -267,18 +264,16 @@ window.jsqrReady = new Promise(function(resolve){
   .pay-banner{ border-radius:8px; padding:12px 14px; margin:10px 0 6px; font-weight:800; font-size:15px; color:#fff; }
   .pay-banner.completo{ background:#1F7A3A; } .pay-banner.reserva, .pay-banner.sin{ background:#B8741A; }
   .pay-tag{ display:inline-block; border-radius:10px; padding:2px 8px; font-size:11px; font-weight:800; margin-left:6px; vertical-align:middle; color:#fff; }
+  .pay-tag.completo{ background:#1F7A3A; } .pay-tag.reserva, .pay-tag.sin{ background:#B8741A; }
   .pay-right{ margin-top:6px; }
   /* Estado de pago con el mismo estilo que el estado de aprobación */
   .camper-row .badge, .pay-right .pay-tag{ display:inline-block; min-width:84px; text-align:center; box-sizing:border-box; }
   .pay-right .pay-tag{ margin-left:0; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap; letter-spacing:0; }
-  .pay-right .pay-tag.completo{ background:#E6F0E6; color:var(--ok); }
-  .pay-right .pay-tag.reserva, .pay-right .pay-tag.sin{ background:#FBF0DA; color:#9A6412; }
   /* Un poco más oscuros y con borde fino (lista de registros) */
   .camper-row .badge, .pay-right .pay-tag{ border:1px solid transparent; }
   .camper-row .badge.aprobado, .pay-right .pay-tag.completo{ background:#D3E6D6; color:#1F5C38; border-color:#9CC5A6; }
   .camper-row .badge.pendiente, .pay-right .pay-tag.reserva, .pay-right .pay-tag.sin{ background:#F6E2B8; color:#7A4E0C; border-color:#DDB66A; }
   .camper-row .badge.rechazado{ background:#F1CFC4; color:#8E2A1E; border-color:#D99A8A; }
-  .pay-tag.completo{ background:#1F7A3A; } .pay-tag.reserva, .pay-tag.sin{ background:#B8741A; }
   .allergy-alert{ background:#B0301F; color:#fff; border-radius:8px; padding:12px 14px; margin:10px 0; font-size:15px; font-weight:700; letter-spacing:.3px; }
   .allergy-alert b{ font-size:18px; display:block; margin-top:2px; }
   .age-alert{ background:#5B3A9E; color:#fff; border-radius:8px; padding:12px 14px; margin:10px 0; font-size:15px; font-weight:700; letter-spacing:.3px; }
@@ -298,7 +293,7 @@ window.jsqrReady = new Promise(function(resolve){
   .camper-row h3{ font-size:15px; color:var(--pine-dark); margin-bottom:2px; }
   .camper-row p{ margin:2px 0; font-size:13px; color:var(--wood); }
   .badge{ font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap; }
-  .badge.aprobado{ background:#E6F0E6; color:var(--ok); }
+  .badge.aprobado{ background:#E3F0EC; color:var(--ok); }
   .badge.pendiente{ background:#FBF0DA; color:var(--warn); }
   .badge.rechazado{ background:#F8E3DC; color:var(--bad); }
   .camper-row .thumb{ width:54px; height:54px; object-fit:cover; border-radius:4px; border:1px solid var(--line); cursor:pointer; }
@@ -306,18 +301,18 @@ window.jsqrReady = new Promise(function(resolve){
   .camper-row .row-actions button{ flex:1; min-width:90px; }
   .tick-status{ font-size:12px; color:var(--wood); margin-top:6px; }
 
-  .modal-overlay{ position:fixed; inset:0; background:rgba(21,42,32,0.82); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal-overlay{ position:fixed; inset:0; background:rgba(28,40,50,0.82); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
   .modal-overlay.active{ display:flex; }
   .modal-box{ background:var(--cream); border-radius:8px; padding:20px; max-width:440px; width:100%; max-height:88vh; overflow:auto; }
   .modal-box img{ width:100%; border-radius:5px; margin:12px 0; border:1px solid var(--line); }
-  .modal-box .ai-note{ font-size:13px; background:#F0EADA; padding:10px 12px; border-radius:5px; margin-bottom:10px; }
+  .modal-box .ai-note{ font-size:13px; background:#E8EEF2; padding:10px 12px; border-radius:5px; margin-bottom:10px; }
   .modal-close{ display:flex; justify-content:flex-end; }
 
   .scanner-panel{ text-align:center; }
   .scanner-panel video{ width:100%; max-width:360px; border-radius:8px; background:#000; }
   .scan-status{ margin:16px auto; padding:14px; border-radius:6px; font-weight:700; font-size:15px; max-width:360px; }
-  .scan-status.idle{ background:#F0EADA; color:var(--wood); }
-  .scan-status.ok{ background:#E6F0E6; color:var(--ok); }
+  .scan-status.idle{ background:#E8EEF2; color:var(--wood); }
+  .scan-status.ok{ background:#E3F0EC; color:var(--ok); }
   .scan-status.fail{ background:#F8E3DC; color:var(--bad); }
   .scan-status.warn{ background:#FBF0DA; color:var(--warn); }
   .scan-log{ text-align:left; max-width:360px; margin:0 auto; font-size:12px; color:var(--wood); max-height:140px; overflow:auto; }
@@ -334,13 +329,13 @@ window.jsqrReady = new Promise(function(resolve){
     .ticket, .stub{ break-inside:avoid; }
   }
 
-  header.topo.admin-head{ background:linear-gradient(rgba(12,33,23,.72),rgba(12,33,23,.88)), var(--theme-img) center 40% / cover no-repeat; aspect-ratio:auto; min-height:0; padding:26px 16px 22px; }
+  header.topo.admin-head{ background:#000; aspect-ratio:auto; min-height:0; padding:26px 16px 22px; }
   header.topo.admin-head h1{ color:var(--gold); font-size:26px; margin:0; }
   header.topo.admin-head p{ margin:4px 0 0; color:var(--cream); font-size:15px; }
   .admin-nav{ padding:14px 22px 0; }
   .admin-nav a{ color:var(--gold); font-weight:700; text-decoration:none; }
 
-  .meal-counter{ font-weight:700; font-size:14px; color:var(--pine-dark); background:#E6F0E6; border-radius:6px; padding:8px 12px; margin-bottom:10px; text-align:center; }
+  .meal-counter{ font-weight:700; font-size:14px; color:var(--pine-dark); background:#E3F0EC; border-radius:6px; padding:8px 12px; margin-bottom:10px; text-align:center; }
   details.tally{ background:var(--cream); border:1px solid var(--line); border-radius:6px; margin-bottom:18px; }
   details.tally > summary{ cursor:pointer; padding:12px 14px; font-weight:700; color:var(--pine-dark); }
   details.tally > summary small{ font-weight:400; color:var(--wood); }
@@ -349,11 +344,11 @@ window.jsqrReady = new Promise(function(resolve){
   .tally-table th{ text-align:left; font-size:11px; letter-spacing:.5px; text-transform:uppercase; color:var(--wood); padding:6px 8px; border-bottom:2px solid var(--line); }
   .tally-table td{ padding:7px 8px; border-bottom:1px solid var(--line); }
   .tally-table td.n, .tally-table th.n{ text-align:right; font-variant-numeric:tabular-nums; }
-  .tally-table tr.total td{ font-weight:800; border-top:2px solid var(--pine-dark); border-bottom:none; background:#F0E9D2; }
+  .tally-table tr.total td{ font-weight:800; border-top:2px solid var(--pine-dark); border-bottom:none; background:#E8EEF2; }
   .tally-h{ font-size:13px; color:var(--pine-dark); margin:12px 0 0; font-family:'Karla',sans-serif; font-weight:800; }
   .meal-chips{ display:flex; flex-wrap:wrap; gap:4px; margin:6px 0 2px; }
   .meal-chips span{ font-size:11px; padding:3px 8px; border-radius:12px; background:#EDE7D6; color:var(--wood); }
-  .meal-chips span.used{ background:#E6F0E6; color:var(--ok); font-weight:700; }
+  .meal-chips span.used{ background:#E3F0EC; color:var(--ok); font-weight:700; }
   table.datos{ width:100%; border-collapse:collapse; font-size:14px; margin:8px 0; }
   table.datos td{ padding:6px 4px; border-bottom:1px solid var(--line); vertical-align:top; }
   table.datos td:first-child{ color:var(--wood); width:38%; font-size:12px; text-transform:uppercase; letter-spacing:.4px; }
@@ -361,17 +356,17 @@ window.jsqrReady = new Promise(function(resolve){
   .datos-qr .qr-frame{ display:inline-block; background:#fff; padding:10px; border-radius:10px; border:1px solid var(--line); line-height:0; }
   .datos-qr .qr-frame canvas, .datos-qr .qr-frame img{ display:block; }
 
-  .big-scan{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; width:100%; min-height:110px; margin:0 0 12px; border:none; border-radius:12px; background:var(--ember); color:#fff; font-family:'Karla',sans-serif; font-size:26px; font-weight:800; letter-spacing:.3px; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25); }
+  .big-scan{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; width:50%; min-width:210px; min-height:84px; margin:0 auto 12px; border:none; border-radius:12px; background:var(--ember); color:#2A2100; font-family:'Karla',sans-serif; font-size:21px; font-weight:800; letter-spacing:.3px; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.25); }
   .big-scan:active{ transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,.25); }
   .big-scan .ico{ font-size:38px; line-height:1; }
   .big-scan small{ font-size:13px; font-weight:600; opacity:.9; letter-spacing:.2px; }
   .tool-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
-  .tool-grid button{ padding:12px 6px; font-size:14px; width:100%; }
+  .tool-grid button{ padding:12px 6px; font-size:14px; width:100%; border-color:#AEBDC9; color:var(--pine-dark); }
   .search-wide{ width:100%; margin-bottom:16px; box-sizing:border-box; }
   .scan-wrap{ position:relative; max-width:420px; margin:0 auto; }
   .scan-wrap video{ width:100%; max-width:none !important; height:min(62vh,460px); object-fit:cover; display:block; }
   .scan-frame{ position:absolute; left:50%; top:50%; width:68%; aspect-ratio:1/1; transform:translate(-50%,-50%); border:3px solid rgba(255,255,255,.9); border-radius:14px; box-shadow:0 0 0 999px rgba(0,0,0,.28); pointer-events:none; }
-  .photo-btn{ display:block; width:100%; box-sizing:border-box; text-align:center; padding:20px 12px; border-radius:10px; cursor:pointer; background:var(--ember); color:#fff; font-size:20px; font-weight:800; margin:0 0 10px; }
+  .photo-btn{ display:block; width:100%; box-sizing:border-box; text-align:center; padding:20px 12px; border-radius:10px; cursor:pointer; background:var(--ember); color:#2A2100; font-size:20px; font-weight:800; margin:0 0 10px; }
   .scan-tip{ font-size:12px; color:var(--wood); margin:6px auto 0; max-width:360px; }
 
   .scan-result{ position:fixed; inset:0; z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; color:#fff; cursor:pointer; }
@@ -394,7 +389,7 @@ window.jsqrReady = new Promise(function(resolve){
 <div class="app">
   <header class="topo admin-head">
     <div class="corner-badge"><img class="logo-img" src="assets/logo.png" data-ev-img="logo" alt="Logo"></div>
-    <h1 data-ev="nombre">Retiro de Pastores</h1>
+    <h1 data-ev="nombre">Campamento CIY</h1>
     <p>Administración</p>
   </header>
   <div class="admin-nav"><a href="./">← Volver al registro</a> &nbsp;·&nbsp; <a href="scanner">Escáner</a></div>
@@ -414,7 +409,7 @@ window.jsqrReady = new Promise(function(resolve){
       <div class="card" id="adminDashCard" style="display:none;">
         <div class="panel" id="adminListPanel">
           <h2>Panel de administración</h2>
-          <p class="hint">Registros sincronizados desde todos los teléfonos de participantes.</p>
+          <p class="hint">Registros sincronizados desde todos los teléfonos de campistas.</p>
 
           <div id="syncStatus" class="result-box"></div>
           <div class="admin-summary" id="adminSummary"></div>
@@ -432,7 +427,7 @@ window.jsqrReady = new Promise(function(resolve){
         </div>
 
         <div class="panel scanner-panel" id="scannerPanel" style="display:none;">
-          <h2>Escanear código de participante</h2>
+          <h2>Escanear código de campista</h2>
           <p class="hint">Funciona con los tres tipos de código: el QR de "registro" en un comprobante pendiente (abre la revisión de pago), la entrada, o un pase de comida.</p>
           <label for="mealSelect" style="display:block;font-weight:700;margin:10px 0 4px;">Qué estás registrando ahora:</label>
           <select id="mealSelect" style="width:100%;padding:10px;font-size:16px;margin-bottom:6px;"></select>
@@ -468,7 +463,7 @@ aplicarEvento("Administración");
 function populateMealSelect(){
   const sel = document.getElementById('mealSelect');
   if(!sel || sel.options.length) return;
-  { const o0=document.createElement('option'); o0.value='e'; o0.textContent='Registro / entrada al retiro'; sel.appendChild(o0); }
+  { const o0=document.createElement('option'); o0.value='e'; o0.textContent='Registro / entrada al campamento'; sel.appendChild(o0); }
   MEALS.forEach((m,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=`Día ${m.dia} — ${m.tipo}`; sel.appendChild(o); });
   try{ const v=localStorage.getItem('mealSel'); if(v!==null) sel.value=v; }catch(e){}
   sel.onchange=()=>{ try{localStorage.setItem('mealSel',sel.value);}catch(e){} updateMealCounter(); };
@@ -485,7 +480,7 @@ async function doAdminLogin(){
   if(!tried) return;
   const ok = await window.storage.auth(tried);
   if(ok === 'error'){
-    err.textContent = (window._authErr && window._authErr.includes('ADMIN_PIN')) ? window._authErr : 'No hay conexión con el servidor. La app debe estar publicada en Vercel (no en GitHub Pages) y desplegada de nuevo después de agregar las variables.';
+    err.textContent = 'No hay conexión con el servidor. La app debe estar publicada en Vercel (no en GitHub Pages) y desplegada de nuevo después de agregar las variables.';
   } else if(ok){
     try{ sessionStorage.setItem('ciyPin', tried); }catch(e){}
     input.value = '';
@@ -520,12 +515,12 @@ async function startAdminWatch(){
   const hl = await window.storage.health();
   if(st && !hl.ok){
     st.className = 'result-box fail';
-    st.innerHTML = '<strong>La base de datos no responde</strong>' + esc(hl.error || 'Error desconocido') + '<br><small>Mientras no responda, los registros de los participantes no llegan a este panel.</small>';
+    st.innerHTML = '<strong>La base de datos no responde</strong>' + esc(hl.error || 'Error desconocido') + '<br><small>Mientras no responda, los registros de los campistas no llegan a este panel.</small>';
   } else if(st){
     st.className = 'result-box ' + (mode !== 'local' ? 'ok' : 'fail');
     st.innerHTML = mode !== 'local'
-      ? '<strong>Conectado a la base compartida</strong>Los registros llegan aquí en vivo desde los teléfonos de los participantes.'
-      : '<strong>Sin base compartida</strong>La app no está conectada a la base de datos del retiro: solo verás registros hechos en este mismo teléfono. Revisa la URL de Firebase configurada en el archivo.';
+      ? '<strong>Conectado a la base compartida</strong>Los registros llegan aquí en vivo desde los teléfonos de los campistas.'
+      : '<strong>Sin base compartida</strong>La app no está conectada a la base de datos del campamento: solo verás registros hechos en este mismo teléfono. Revisa la URL de Firebase configurada en el archivo.';
   }
   adminUnwatch = await window.storage.watch('registrations:', applyRegistrations);
   loadRegistrations();
@@ -560,13 +555,13 @@ function renderAdminList(){
     <div class="camper-row clickable" role="button" tabindex="0" onclick="openDatos('${r.id}')" onkeydown="if(event.key==='Enter')openDatos('${r.id}')">
       <div class="top">
         <div>
-          <h3>${n}. ${esc(r.nombreCompleto)}${personasDe(r) > 1 ? '<span class="age-tag" style="background:#2F5D8A">FAMILIA (' + personasDe(r) + ')</span>' : ''}${r.tieneAlergias ? '<span class="allergy-tag">⚠ ALERGIAS</span>' : ''}${esMenor12(r) ? '<span class="age-tag">MENOR (' + edadDe(r) + ')</span>' : ''}</h3>
+          <h3>${n}. ${esc(r.nombreCompleto)}${r.tieneAlergias ? '<span class="allergy-tag">⚠ ALERGIAS</span>' : ''}${esMenor12(r) ? '<span class="age-tag">MENOR (' + edadDe(r) + ')</span>' : ''}</h3>
           <p>${esc(r.iglesia)}${r.telefono ? ' · Tel: ' + esc(r.telefono) : ''}</p>
           <p class="tick-status">${esc(r.id)} · Entrada: ${entradaUsada ? '✓' : '—'} · Comidas: ${mealsUsed}/${MEALS.length}</p>
         </div>
         <div style="text-align:right;">
           <span class="badge ${r.estado}">${r.estado === 'aprobado' ? 'Aprobado' : r.estado === 'rechazado' ? 'Rechazado' : 'Pendiente'}</span>
-          ${r.estado==='aprobado' ? (()=>{const p=pagoInfo(r); return '<div class="pay-right"><span class="pay-tag '+p.clave+'">'+(p.clave==='completo'?(p.precio===0?'Sin costo':'Pagado'):p.clave==='reserva'?'Debe '+lempiras(p.saldo):'¿Pago?')+'</span></div>';})() : ''}
+          ${r.estado==='aprobado' ? (()=>{const p=pagoInfo(r); return '<div class="pay-right"><span class="pay-tag '+p.clave+'">'+(p.clave==='completo'?'Pagado':p.clave==='reserva'?'Debe '+lempiras(p.saldo):'¿Pago?')+'</span></div>';})() : ''}
           <div class="row-open">Abrir ›</div>
         </div>
       </div>
@@ -577,7 +572,7 @@ function renderAdminList(){
 async function exportSpreadsheet(){
   if(!allRegistrations.length){ toast('No hay registros para exportar todavía.'); return; }
   const mealHeaders = MEALS.map(m => `${m.tipo} D${m.dia}`);
-  const headers = ['#','ID','Nombre completo','Fecha nacimiento','Edad al ' + (EV.fechaInicio || 'inicio'),'Teléfono','Iglesia','Encargado',...(PEDIR_EMERGENCIA ? ['Contacto de emergencia','Número de emergencia'] : []), ...(PEDIR_BAUTIZO ? ['Bautizado'] : []),'Alergias','Detalle de alergias','Personas','Familia','Categoría','Costo (L.)','Pago','Monto pagado (L.)','Saldo pendiente (L.)','Estado',
+  const headers = ['#','ID','Nombre completo','Fecha nacimiento','Edad al ' + (EV.fechaInicio || 'inicio'),'Teléfono','Iglesia','Encargado','Contacto de emergencia','Número de emergencia','Bautizado','Alergias','Detalle de alergias','Pago','Monto pagado (L.)','Saldo pendiente (L.)','Estado',
     'Revisado manualmente',
     'Fecha de registro','Entrada usada','Hora de entrada', ...mealHeaders];
 
@@ -585,9 +580,8 @@ async function exportSpreadsheet(){
     const v = r.verificacionPago || {};
     const base = [
       idx+1, r.id, r.nombreCompleto, r.fechaNacimiento, edadDe(r) === null ? '' : edadDe(r), r.telefono || '', r.iglesia, r.encargado || '',
-      ...(PEDIR_EMERGENCIA ? [r.contactoEmergencia || '', r.telEmergencia || ''] : []), ...(PEDIR_BAUTIZO ? [r.bautizado || ''] : []), r.tieneAlergias ? 'Sí' : 'No', r.tieneAlergias ? (r.alergias || '') : '',
-      personasDe(r), familiaTexto(r), categoriaDe(r), precioDe(r),
-      r.estado === 'aprobado' ? (precioDe(r)===0?'Sin costo':r.pago==='completo'?'Pago completo':r.pago==='reserva'?'Reserva':'Sin definir') : '',
+      r.contactoEmergencia || '', r.telEmergencia || '', r.bautizado || '', r.tieneAlergias ? 'Sí' : (r.bautizado ? 'No' : ''), r.tieneAlergias ? (r.alergias || '') : '',
+      r.estado === 'aprobado' ? (r.pago==='completo'?'Pago completo':r.pago==='reserva'?'Reserva':'Sin definir') : '',
       r.estado === 'aprobado' ? pagoInfo(r).pagado : 0,
       r.estado === 'aprobado' ? pagoInfo(r).saldo : '',
       r.estado === 'aprobado' ? 'Aprobado' : r.estado === 'rechazado' ? 'Rechazado' : 'Pendiente',
@@ -634,7 +628,7 @@ async function setEstado(id, estado, reopen, pago){
     if(!res) { toast('Registro no encontrado.'); return; }
     const record = JSON.parse(res.value);
     record.estado = estado;
-    if(pago){ record.pago = pago; record.montoPagado = pagoInfo(record).pagado; }
+    if(pago){ record.pago = pago; record.montoPagado = pago === 'completo' ? PRECIO_TOTAL : PRECIO_RESERVA; }
     record.revisadoManualmente = true;
     record.fechaRevision = new Date().toISOString();
     const w = await window.storage.set('registrations:'+id, JSON.stringify(record), true);
@@ -651,7 +645,7 @@ async function cambiarPago(id, pago){
     const res = await window.storage.get('registrations:'+id, true);
     if(!res){ toast('Registro no encontrado.'); return; }
     const rec = JSON.parse(res.value);
-    rec.pago = pago; rec.montoPagado = pagoInfo(rec).pagado; rec.fechaPago = new Date().toISOString();
+    rec.pago = pago; rec.montoPagado = pago === 'completo' ? PRECIO_TOTAL : PRECIO_RESERVA; rec.fechaPago = new Date().toISOString();
     const w = await window.storage.set('registrations:'+id, JSON.stringify(rec), true);
     if(!w.synced){ toast('No se pudo guardar el cambio.'); return; }
     toast('Pago actualizado: ' + pagoInfo(rec).texto);
@@ -671,30 +665,40 @@ async function loadReceipt(r){
 function closeModal(){ document.getElementById('modalOverlay').classList.remove('active'); }
 
 
+/* ---------- Edad el primer día del campamento (6 de enero de 2027) ---------- */
+const _fi = String(EV.fechaInicio || '').split('-').map(Number);
+const FECHA_CAMPAMENTO = _fi.length === 3 && _fi[0] ? new Date(_fi[0], _fi[1]-1, _fi[2]) : new Date();
 const EDAD_AVISO = Number(EV.edadAviso) || 12;
+function edadDe(r){
+  const m = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec((r && r.fechaNacimiento) || '');
+  if(!m) return null;
+  const hoy = FECHA_CAMPAMENTO; let e = hoy.getFullYear() - (+m[1]);
+  if((hoy.getMonth()+1) < (+m[2]) || ((hoy.getMonth()+1) === (+m[2]) && hoy.getDate() < (+m[3]))) e--;
+  return (e >= 0 && e < 120) ? e : null;
+}
 function esMenor12(r){ const e = edadDe(r); return e !== null && e < EDAD_AVISO; }
 
 /* ---------- Conteo de comidas ---------- */
 function mealStats(){
   const regs = allRegistrations;
-  const meals = MEALS.map((m,i)=>({ label:`Día ${m.dia} — ${m.tipo}`, served: regs.filter(r=>r.comidas && r.comidas[i] && r.comidas[i].usado).reduce((t,r)=>t + personasDe(r), 0) }));
-  const entradas = regs.filter(r=>r.entradaEscaneada && r.entradaEscaneada.usado).reduce((t,r)=>t + personasDe(r), 0);
+  const meals = MEALS.map((m,i)=>({ label:`Día ${m.dia} — ${m.tipo}`, served: regs.filter(r=>r.comidas && r.comidas[i] && r.comidas[i].usado).length }));
+  const entradas = regs.filter(r=>r.entradaEscaneada && r.entradaEscaneada.usado).length;
   const totalMeals = meals.reduce((a,m)=>a+m.served,0);
-  const aprobados = regs.filter(r=>r.estado==='aprobado').reduce((t,r)=>t + personasDe(r), 0);
+  const aprobados = regs.filter(r=>r.estado==='aprobado').length;
   const byChurch = {};
   regs.forEach(r=>{
     const key = (r.iglesia||'Sin iglesia').trim().toLowerCase();
     const c = byChurch[key] = byChurch[key] || { nombre:(r.iglesia||'Sin iglesia').trim(), inscritos:0, aprobados:0, entradas:0, comidas:0 };
-    const np = personasDe(r); c.inscritos += np; if(r.estado==='aprobado') c.aprobados += np;
-    if(r.entradaEscaneada && r.entradaEscaneada.usado) c.entradas += np;
-    c.comidas += (r.comidas||[]).filter(x=>x && x.usado).length * np;
+    c.inscritos++; if(r.estado==='aprobado') c.aprobados++;
+    if(r.entradaEscaneada && r.entradaEscaneada.usado) c.entradas++;
+    c.comidas += (r.comidas||[]).filter(x=>x && x.usado).length;
   });
   const churches = Object.values(byChurch).sort((a,b)=>a.nombre.localeCompare(b.nombre));
   const ap = regs.filter(r=>r.estado==='aprobado');
   const pagos = { completos: ap.filter(r=>r.pago==='completo').length, reservas: ap.filter(r=>r.pago==='reserva').length, sin: ap.filter(r=>r.pago!=='completo' && r.pago!=='reserva').length };
-  pagos.cobrado = ap.reduce((t,r)=>t + pagoInfo(r).pagado, 0);
-  pagos.pendiente = ap.reduce((t,r)=>t + pagoInfo(r).saldo, 0);
-  return { meals, entradas, totalMeals, aprobados, inscritos: regs.reduce((t,r)=>t + personasDe(r), 0), churches, pagos };
+  pagos.cobrado = pagos.completos*PRECIO_TOTAL + pagos.reservas*PRECIO_RESERVA;
+  pagos.pendiente = pagos.reservas*(PRECIO_TOTAL-PRECIO_RESERVA) + pagos.sin*PRECIO_TOTAL;
+  return { meals, entradas, totalMeals, aprobados, inscritos: regs.length, churches, pagos };
 }
 function renderTally(){
   const box = document.getElementById('tallyPanel'); if(!box) return;
@@ -712,8 +716,8 @@ function renderTally(){
       <p class="tally-h">Entrada: ${st.entradas} de ${st.aprobados} aprobados han llegado</p>
       <p class="tally-h">Pagos (aprobados)</p>
       <table class="tally-table">
-        <tr><td>Pago completo${PRECIOS ? '' : ' (' + lempiras(PRECIO_TOTAL) + ')'}</td><td class="n">${st.pagos.completos}</td></tr>
-        ${RESERVA_ACTIVA ? `<tr><td>Solo reserva (${lempiras(PRECIO_RESERVA)})</td><td class="n">${st.pagos.reservas}</td></tr>` : ''}
+        <tr><td>Pago completo (${lempiras(PRECIO_TOTAL)})</td><td class="n">${st.pagos.completos}</td></tr>
+        <tr><td>Solo reserva (${lempiras(PRECIO_RESERVA)})</td><td class="n">${st.pagos.reservas}</td></tr>
         <tr><td>Sin definir</td><td class="n">${st.pagos.sin}</td></tr>
         <tr><td>Total cobrado</td><td class="n">${lempiras(st.pagos.cobrado)}</td></tr>
         <tr class="total"><td>Saldo por cobrar</td><td class="n">${lempiras(st.pagos.pendiente)}</td></tr>
@@ -749,7 +753,7 @@ function updateMealCounter(){
   else { const i = parseInt(sel.value)||0; el.textContent = `${st.meals[i].label}: ${st.meals[i].served} servidas de ${st.aprobados} aprobados`; }
 }
 
-/* ---------- Datos del participante + QR pequeño para volver a compartir ---------- */
+/* ---------- Datos del campista + QR pequeño para volver a compartir ---------- */
 function openDatos(id){
   const r = allRegistrations.find(x => x.id === id);
   if(!r) return;
@@ -762,35 +766,30 @@ function openDatos(id){
 
     ${esMenor12(r) ? `<div class="age-alert">MENOR (${edadDe(r)})<br><b>Menor de ${EDAD_AVISO} años al iniciar el evento (${esc(EV.fechaTexto || '')})</b></div>` : ''}
     ${r.tieneAlergias ? `<div class="allergy-alert">⚠️ ALERGIAS<br><b>${esc(r.alergias || 'Sin detalle')}</b></div>` : ''}
-    ${r.estado === 'aprobado' ? (()=>{ const p = pagoInfo(r); return `<div class="pay-banner ${p.clave}">${p.clave==='completo' ? (p.precio===0 ? '✓ SIN COSTO' : '✓ PAGO COMPLETO · ' + lempiras(p.precio)) : p.clave==='reserva' ? '⚠ RESERVA ' + lempiras(p.pagado) + ' — DEBE ' + lempiras(p.saldo) : '⚠ APROBADO SIN DEFINIR PAGO'}</div>
-      <div class="btn-row">${p.clave !== 'completo' ? `<button class="primary" style="background:var(--ok);" onclick="cambiarPago('${esc(r.id)}','completo')">💰 Marcar pago completo</button>` : ''}${p.clave !== 'reserva' && RESERVA_ACTIVA && p.precio > PRECIO_RESERVA ? `<button class="ghost" onclick="cambiarPago('${esc(r.id)}','reserva')">Cambiar a reserva ${lempiras(Math.min(PRECIO_RESERVA, p.precio))}</button>` : ''}</div>`; })() : ''}
+    ${r.estado === 'aprobado' ? (()=>{ const p = pagoInfo(r); return `<div class="pay-banner ${p.clave}">${p.clave==='completo' ? '✓ PAGO COMPLETO · ' + lempiras(PRECIO_TOTAL) : p.clave==='reserva' ? '⚠ RESERVA ' + lempiras(PRECIO_RESERVA) + ' — DEBE ' + lempiras(p.saldo) : '⚠ APROBADO SIN DEFINIR PAGO'}</div>
+      <div class="btn-row">${p.clave !== 'completo' ? `<button class="primary" style="background:var(--ok);" onclick="cambiarPago('${esc(r.id)}','completo')">💰 Marcar pago completo</button>` : ''}${p.clave !== 'reserva' ? `<button class="ghost" onclick="cambiarPago('${esc(r.id)}','reserva')">Cambiar a reserva ${lempiras(PRECIO_RESERVA)}</button>` : ''}</div>`; })() : ''}
     <div class="detail-sec">Comprobante de pago</div>
     <div id="receiptSlot" class="receipt-box"><p class="hint">Cargando comprobante…</p></div>
     <div class="btn-row">
-      ${r.estado !== 'aprobado' ? `${RESERVA_ACTIVA && precioDe(r) > PRECIO_RESERVA ? `<button class="primary" onclick="setEstado('${esc(r.id)}','aprobado',true,'reserva')">✓ Aprobar · Reserva ${lempiras(Math.min(PRECIO_RESERVA, precioDe(r)))}</button>` : ''}<button class="primary" style="background:var(--ok);" onclick="setEstado('${esc(r.id)}','aprobado',true,'completo')">✓ Aprobar · ${precioDe(r) === 0 ? 'Sin costo' : 'Pago completo ' + lempiras(precioDe(r))}</button>` : ''}
+      ${r.estado !== 'aprobado' ? `<button class="primary" onclick="setEstado('${esc(r.id)}','aprobado',true,'reserva')">✓ Aprobar · Reserva ${lempiras(PRECIO_RESERVA)}</button><button class="primary" style="background:var(--ok);" onclick="setEstado('${esc(r.id)}','aprobado',true,'completo')">✓ Aprobar · Pago completo ${lempiras(PRECIO_TOTAL)}</button>` : ''}
       ${r.estado !== 'rechazado' ? `<button class="ghost" onclick="setEstado('${esc(r.id)}','rechazado',true)">✕ Rechazar</button>` : ''}
       ${r.estado !== 'pendiente' ? `<button class="ghost" onclick="setEstado('${esc(r.id)}','pendiente',true)">Volver a pendiente</button>` : ''}
     </div>
 
-    ${r.familia ? `<div class="detail-sec">Familia · ${personasDe(r)} personas</div>
-    <table class="datos">
-      ${detalleFamilia(r.familia).map(p => `<tr><td>${esc(p.rol)}</td><td>${esc(p.nombre)}${p.rol === 'Hijo/a' ? ' · ' + esc(p.fechaNacimiento || 'sin fecha') + (p.edad !== null ? ' (' + p.edad + ' años)' : '') : ''} — <b>${p.precio === 0 ? 'Gratis' : lempiras(p.precio)}</b></td></tr>`).join('')}
-      <tr><td>Total</td><td><b>${lempiras(precioDe(r))}</b> · depósito pedido ${lempiras(depositoDe(precioDe(r)))}</td></tr>
-    </table>` : ''}
-    <div class="detail-sec">Datos ${r.familia ? 'del pastor' : 'del participante'}</div>
+    <div class="detail-sec">Datos del campista</div>
     <table class="datos">
       <tr><td>Teléfono</td><td>${esc(r.telefono || '—')}</td></tr>
       <tr><td>Nacimiento</td><td>${esc(r.fechaNacimiento || '—')}${edadDe(r) !== null ? ' (' + edadDe(r) + ' años)' : ''}</td></tr>
       <tr><td>Iglesia</td><td>${esc(r.iglesia || '—')}</td></tr>
-      ${CALCULADORA && !r.encargado ? '' : `<tr><td>Líder / pastor</td><td>${esc(r.encargado || '—')}</td></tr>`}
-      ${PEDIR_EMERGENCIA ? `<tr><td>Contacto de emergencia</td><td>${esc(r.contactoEmergencia || '—')}</td></tr>
-      <tr><td>Número de emergencia</td><td>${esc(r.telEmergencia || '—')}</td></tr>` : ''}
-      ${PEDIR_BAUTIZO ? `<tr><td>Bautizado</td><td>${esc(r.bautizado || '—')}</td></tr>` : ''}
+      <tr><td>Líder / pastor</td><td>${esc(r.encargado || '—')}</td></tr>
+      <tr><td>Contacto de emergencia</td><td>${esc(r.contactoEmergencia || '—')}</td></tr>
+      <tr><td>Número de emergencia</td><td>${esc(r.telEmergencia || '—')}</td></tr>
+      <tr><td>Bautizado</td><td>${esc(r.bautizado || '—')}</td></tr>
       <tr><td>Registrado</td><td>${r.creado ? new Date(r.creado).toLocaleString() : '—'}</td></tr>
     </table>
     <div class="datos-qr">
       <div class="qr-frame"><div id="datosQr"></div></div>
-      <p class="small-note">Código QR del participante</p>
+      <p class="small-note">Código QR del campista</p>
       <button class="ghost small" id="datosShareBtn">Compartir / guardar imagen</button>
       <div class="small-note" id="datosMsg"></div>
     </div>
@@ -837,15 +836,15 @@ function openEdit(id){
   if(!r) return;
   document.getElementById('modalContent').innerHTML = `
     <h2>Editar registro</h2>
-    <p class="hint">ID ${esc(r.id)} — los códigos QR del participante siguen siendo válidos.</p>
+    <p class="hint">ID ${esc(r.id)} — los códigos QR del campista siguen siendo válidos.</p>
     <label>Nombre completo</label><input type="text" id="edNombre" value="${esc(r.nombreCompleto)}">
     <label>Fecha de nacimiento (año/mes/día)</label><input type="text" id="edFecha" value="${esc(r.fechaNacimiento)}" placeholder="2008/05/21">
     <label>Teléfono</label><input type="text" id="edTelefono" inputmode="numeric" maxlength="8" value="${esc(r.telefono||'')}">
     <label>Iglesia</label><input type="text" id="edIglesia" value="${esc(r.iglesia)}">
     <label>Encargado</label><input type="text" id="edEncargado" value="${esc(r.encargado||'')}">
-    ${PEDIR_EMERGENCIA ? `    <label>Contacto de emergencia</label><input type="text" id="edContacto" value="${esc(r.contactoEmergencia||'')}">
-    <label>Número de emergencia</label><input type="text" id="edTelEmerg" inputmode="numeric" maxlength="8" value="${esc(r.telEmergencia||'')}">` : ''}
-    ${PEDIR_BAUTIZO ? `    <label>Bautizado</label><select id="edBautizado"><option value=""${!r.bautizado?' selected':''}>—</option><option value="Sí"${r.bautizado==='Sí'?' selected':''}>Sí</option><option value="No"${r.bautizado==='No'?' selected':''}>No</option></select>` : ''}
+    <label>Contacto de emergencia</label><input type="text" id="edContacto" value="${esc(r.contactoEmergencia||'')}">
+    <label>Número de emergencia</label><input type="text" id="edTelEmerg" inputmode="numeric" maxlength="8" value="${esc(r.telEmergencia||'')}">
+    <label>Bautizado</label><select id="edBautizado"><option value=""${!r.bautizado?' selected':''}>—</option><option value="Sí"${r.bautizado==='Sí'?' selected':''}>Sí</option><option value="No"${r.bautizado==='No'?' selected':''}>No</option></select>
     <label>Alergias (déjalo vacío si no tiene)</label><input type="text" id="edAlergias" value="${esc(r.tieneAlergias ? (r.alergias||'') : '')}">
     <div class="row-actions" style="margin-top:14px;">
       <button class="primary small" onclick="saveEdit('${r.id}')">Guardar cambios</button>
@@ -865,11 +864,9 @@ async function saveEdit(id){
     record.nombreCompleto = nombre; record.fechaNacimiento = fecha; record.iglesia = iglesia;
     record.telefono = (document.getElementById('edTelefono').value || '').replace(/\D/g,'');
     record.encargado = document.getElementById('edEncargado').value.trim();
-    if(PEDIR_EMERGENCIA){
-      record.contactoEmergencia = document.getElementById('edContacto').value.trim();
-      record.telEmergencia = (document.getElementById('edTelEmerg').value || '').replace(/\D/g,'');
-    }
-    if(PEDIR_BAUTIZO) record.bautizado = document.getElementById('edBautizado').value;
+    record.contactoEmergencia = document.getElementById('edContacto').value.trim();
+    record.telEmergencia = (document.getElementById('edTelEmerg').value || '').replace(/\D/g,'');
+    record.bautizado = document.getElementById('edBautizado').value;
     record.alergias = document.getElementById('edAlergias').value.trim();
     record.tieneAlergias = !!record.alergias;
     record.editadoAdmin = new Date().toISOString();
@@ -1042,7 +1039,7 @@ function logScan(kind, msg, res){
 async function handleScannedPayload(text){
   let payload;
   try{ payload = JSON.parse(text); }catch(e){ logScan('fail','Código QR no reconocido.',{title:'QR no reconocido'}); return; }
-  if(!payload.id){ logScan('fail','Código QR no pertenece a este retiro.',{title:'QR de otro evento'}); return; }
+  if(!payload.id){ logScan('fail','Código QR no pertenece a este campamento.',{title:'QR de otro evento'}); return; }
   let record;
   try{
     const res = await window.storage.get('registrations:'+payload.id, true);
@@ -1058,17 +1055,17 @@ async function handleScannedPayload(text){
     return;
   }
   if(record.estado === 'pendiente'){
-    logScan('pending', `PENDIENTE de aprobación — ${record.nombreCompleto}. Abriendo revisión…`,{title:'Pendiente de aprobación', name:nombreConFamilia(record), sub:'Abriendo revisión…'});
+    logScan('pending', `PENDIENTE de aprobación — ${record.nombreCompleto}. Abriendo revisión…`,{title:'Pendiente de aprobación', name:record.nombreCompleto, sub:'Abriendo revisión…'});
     closeScanner();
     await loadRegistrations();
     openModal(record.id);
     return;
   }
   const pg = pagoInfo(record);
-  const payNote = pg.clave === 'completo' ? (pg.precio === 0 ? '✓ SIN COSTO' : '✓ PAGADO') : pg.clave === 'reserva' ? `⚠ DEBE ${lempiras(pg.saldo)} (solo reserva)` : '⚠ PAGO SIN DEFINIR';
+  const payNote = pg.clave === 'completo' ? '✓ PAGADO' : pg.clave === 'reserva' ? `⚠ DEBE ${lempiras(pg.saldo)} (solo reserva)` : '⚠ PAGO SIN DEFINIR';
   const payKind = pg.clave === 'completo' ? 'ok' : 'deposit';
   if(record.estado !== 'aprobado'){
-    logScan('fail', `RECHAZADO — ${record.nombreCompleto}. No permitir el ingreso.`,{title:'Rechazado', name:nombreConFamilia(record), sub:'No permitir el ingreso'});
+    logScan('fail', `RECHAZADO — ${record.nombreCompleto}. No permitir el ingreso.`,{title:'Rechazado', name:record.nombreCompleto, sub:'No permitir el ingreso'});
     return;
   }
 
@@ -1077,34 +1074,34 @@ async function handleScannedPayload(text){
   if(!record.comidas) record.comidas = MEALS.map(()=>({usado:false, hora:null}));
   if(mode === 'e'){
     if(record.entradaEscaneada && record.entradaEscaneada.usado){
-      logScan('fail', `Entrada YA registrada (${new Date(record.entradaEscaneada.hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:'Registro: ya usado', name:nombreConFamilia(record), sub:'Registrado a las ' + new Date(record.entradaEscaneada.hora).toLocaleTimeString()});
+      logScan('fail', `Entrada YA registrada (${new Date(record.entradaEscaneada.hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:'Registro: ya usado', name:record.nombreCompleto, sub:'Registrado a las ' + new Date(record.entradaEscaneada.hora).toLocaleTimeString()});
       return;
     }
     record.entradaEscaneada = { usado:true, hora:new Date().toISOString() };
     const w = await window.storage.set('registrations:'+record.id, JSON.stringify(record), true);
     if(!w.synced){ logScan('fail', 'No se pudo guardar en el servidor. Intenta de nuevo.',{title:'No se guardó', sub:'Intenta de nuevo'}); return; }
-    logScan(payKind, `Entrada válida — ${record.nombreCompleto} (${record.iglesia}) · ${payNote}`,{title:'Registro / entrada', name:nombreConFamilia(record), sub:payNote + (record.tieneAlergias ? ' · ⚠ ALERGIAS: ' + record.alergias : '')});
+    logScan(payKind, `Entrada válida — ${record.nombreCompleto} (${record.iglesia}) · ${payNote}`,{title:'Registro / entrada', name:record.nombreCompleto, sub:payNote + (record.tieneAlergias ? ' · ⚠ ALERGIAS: ' + record.alergias : '')});
   } else {
     const idx = parseInt(mode) || 0;
     const meal = MEALS[idx];
     const label = `${meal.tipo} (Día ${meal.dia})`;
     if(record.comidas[idx] && record.comidas[idx].usado){
-      logScan('fail', `${label} YA utilizado (${new Date(record.comidas[idx].hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:`D${meal.dia} ${meal.tipo}: ya usado`, name:nombreConFamilia(record), sub:'Usado a las ' + new Date(record.comidas[idx].hora).toLocaleTimeString()});
+      logScan('fail', `${label} YA utilizado (${new Date(record.comidas[idx].hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:`D${meal.dia} ${meal.tipo}: ya usado`, name:record.nombreCompleto, sub:'Usado a las ' + new Date(record.comidas[idx].hora).toLocaleTimeString()});
       return;
     }
     record.comidas[idx] = { usado:true, hora:new Date().toISOString() };
     const w = await window.storage.set('registrations:'+record.id, JSON.stringify(record), true);
     if(!w.synced){ logScan('fail', 'No se pudo guardar en el servidor. Intenta de nuevo.',{title:'No se guardó', sub:'Intenta de nuevo'}); return; }
-    logScan(payKind, `${label} válido — ${record.nombreCompleto} · ${payNote}`,{title:`D${meal.dia} ${meal.tipo}`, name:nombreConFamilia(record), sub:payNote + (record.tieneAlergias ? ' · ⚠ ALERGIAS: ' + record.alergias : '')});
+    logScan(payKind, `${label} válido — ${record.nombreCompleto} · ${payNote}`,{title:`D${meal.dia} ${meal.tipo}`, name:record.nombreCompleto, sub:payNote + (record.tieneAlergias ? ' · ⚠ ALERGIAS: ' + record.alergias : '')});
   }
   loadRegistrations();
 }
 
-/* Registro en mesa a partir de los datos del QR (si el teléfono del participante no pudo enviarlo antes) */
+/* Registro en mesa a partir de los datos del QR (si el teléfono del campista no pudo enviarlo antes) */
 function openCreateFromQr(payload){
   document.getElementById('modalContent').innerHTML = `
     <h2>Registro no encontrado</h2>
-    <p class="hint">El código ${esc(payload.id)} no está en el servidor (el teléfono del participante no pudo enviarlo). El código trae estos datos:</p>
+    <p class="hint">El código ${esc(payload.id)} no está en el servidor (el teléfono del campista no pudo enviarlo). El código trae estos datos:</p>
     <p><b>${esc(payload.n)}</b><br>${esc(payload.i || '')}</p>
     <p class="hint">Si lo creas, queda como <b>pendiente</b>. Verifica su pago y luego apruébalo.</p>
     <div class="row-actions" style="margin-top:14px;">

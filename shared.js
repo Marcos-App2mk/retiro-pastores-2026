@@ -133,7 +133,7 @@ window.storage = {
     const t = setInterval(async ()=>cb(await window.storage.all(prefix)), 5000);
     return ()=>clearInterval(t);
   },
-  async auth(pin){ if(!API) return !!ADMIN_PIN && pin === ADMIN_PIN; try{ const j = await api({op:'auth', pin}); if(j.ok) SESSION_PIN = pin; return !!j.ok; }catch(e){ window._authErr = String(e.message || e); return 'error'; } },
+  async auth(pin){ if(!API) return false; try{ const j = await api({op:'auth', pin}); if(j.ok) SESSION_PIN = pin; return !!j.ok; }catch(e){ return 'error'; } },
   async health(){ if(!API) return { ok:true }; try{ await api({op:'health'}); return { ok:true }; }catch(e){ return { ok:false, error:String(e.message||e) }; } },
   async mode(){ if(API) return 'api'; if(FB) return 'firebase'; return (await getDb()) ? 'db' : 'local'; }
 };
@@ -141,7 +141,7 @@ function esc(t){ return String(t==null?'':t).replace(/[&<>"']/g, c=>({'&':'&amp;
 function toast(msg){
   let t = document.getElementById('toastBox');
   if(!t){ t = document.createElement('div'); t.id='toastBox';
-    t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#152A20;color:#fff;padding:12px 18px;border-radius:8px;z-index:99;max-width:90%;font-size:14px;box-shadow:0 4px 18px rgba(0,0,0,.5);';
+    t.style.cssText='position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#243441;color:#fff;padding:12px 18px;border-radius:8px;z-index:99;max-width:90%;font-size:14px;box-shadow:0 4px 18px rgba(0,0,0,.5);';
     document.body.appendChild(t); }
   t.textContent = msg; t.style.display='block';
   clearTimeout(t._h); t._h = setTimeout(()=>{ t.style.display='none'; }, 4500);
@@ -152,9 +152,6 @@ const EV = window.EVENTO || {};
 const MEALS = (EV.comidas && EV.comidas.length) ? EV.comidas : [{dia:1, tipo:'Comida'}];
 const MONEDA = EV.moneda || 'L.';
 const PRECIO_TOTAL = Number(EV.precioTotal) || 0, PRECIO_RESERVA = Number(EV.reserva) || 0;
-const PRECIOS = (Array.isArray(EV.precios) && EV.precios.length) ? EV.precios : null;
-const RESERVA_ACTIVA = PRECIO_RESERVA > 0;
-const PEDIR_EMERGENCIA = EV.pedirEmergencia !== false, PEDIR_BAUTIZO = EV.pedirBautizo !== false; // por defecto se piden (como en CIY)
 const SIGLAS = String(EV.siglas || 'EVT').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8) || 'EVT';
 function lempiras(n){ return MONEDA + Number(n||0).toLocaleString('en-US'); }
 function aplicarEvento(sufijoTitulo){
@@ -164,26 +161,22 @@ function aplicarEvento(sufijoTitulo){
     fechaTexto: EV.fechaTexto || '', fechaLimite: EV.fechaLimite || '', siglas: SIGLAS,
     precioTotal: lempiras(PRECIO_TOTAL), reserva: lempiras(PRECIO_RESERVA), saldoReserva: lempiras(PRECIO_TOTAL - PRECIO_RESERVA),
     banco: (EV.banco && EV.banco.nombre) || '', nroComidas: String(MEALS.length), edadAviso: String(EV.edadAviso || 12),
-    ejemploCodigo: SIGLAS + '-XXXXXX', precioAdulto: lempiras(PRECIOS ? Math.max.apply(null, PRECIOS.map(p=>Number(p.precio)||0)) : PRECIO_TOTAL), notaPago: EV.notaPago || '',
-    listaPrecios: PRECIOS ? PRECIOS.slice().sort((a,b)=>(Number(b.precio)||0)-(Number(a.precio)||0)).map(p => ((Number(p.precio)||0) === 0 ? 'Gratis' : lempiras(p.precio)) + (p.etiqueta ? ' (' + p.etiqueta + ')' : '')).join(' · ') : ''
+    ejemploCodigo: SIGLAS + '-XXXXXX'
   };
-  // data-si="reserva precios ..." → el elemento solo se muestra si se cumplen todas las condiciones
-  const cond = { emergencia: PEDIR_EMERGENCIA, bautizo: PEDIR_BAUTIZO, tituloBanner: !!EV.tituloEnBanner, calculadora: !!EV.calculadoraFamilia, sinCalculadora: !EV.calculadoraFamilia, reserva: RESERVA_ACTIVA, sinReserva: !RESERVA_ACTIVA, precios: !!PRECIOS, precioUnico: !PRECIOS, notaPago: !!EV.notaPago };
-  document.querySelectorAll('[data-si]').forEach(el => { if(!el.getAttribute('data-si').split(/\s+/).every(k => cond[k])) el.style.display = 'none'; });
   document.querySelectorAll('[data-ev]').forEach(el => { const k = el.getAttribute('data-ev'); if(k in textos) el.textContent = textos[k]; });
   document.querySelectorAll('[data-ev-ph]').forEach(el => { const k = el.getAttribute('data-ev-ph'); if(k in textos) el.placeholder = textos[k]; });
   const img = EV.imagenes || {};
-  document.querySelectorAll('img[data-ev-img]').forEach(el => { const k = el.getAttribute('data-ev-img'); if(img[k]){ el.src = img[k]; } else { el.style.display = 'none'; const cb = el.closest('.corner-badge'); if(cb) cb.style.display = 'none'; } });
+  document.querySelectorAll('img[data-ev-img]').forEach(el => { const k = el.getAttribute('data-ev-img'); if(img[k]){ el.src = img[k]; } else { el.style.display = 'none'; } });
   if(img.banner) r.style.setProperty('--theme-img', 'url("' + img.banner + '")');
   if(EV.colorAcento) r.style.setProperty('--ember', EV.colorAcento);
   if(EV.colorAcentoOscuro) r.style.setProperty('--ember-dark', EV.colorAcentoOscuro);
   document.title = (EV.nombre || 'Evento') + (sufijoTitulo ? ' — ' + sufijoTitulo : '');
 }
-const ADMIN_PIN = ''; // El PIN real está solo en Vercel (variable ADMIN_PIN)
+const ADMIN_PIN = ''; // el PIN real vive en Vercel (ADMIN_PIN), no aquí
 
-/* ---------- Código QR del participante e imagen para guardar o compartir ---------- */
+/* ---------- Código QR del campista e imagen para guardar o compartir ---------- */
 function qrPayload(registro){
-  // Un solo QR por participante: sirve para el registro en mesa, la entrada y las comidas.
+  // Un solo QR por campista: sirve para el registro en mesa, la entrada y las 9 comidas.
   return JSON.stringify({ t: SIGLAS.toLowerCase(), id: registro.id, n: registro.nombreCompleto, i: registro.iglesia });
 }
 
@@ -209,23 +202,22 @@ function wrapText(ctx, text, x, y, maxW, lh){
 }
 function buildTicketCanvas(registro, aprobado){
   const W = 900, pad = 40;
-  const items = [{ label: aprobado ? 'REGISTRO, ENTRADA Y ' + MEALS.length + ' COMIDAS' : 'REGISTRO (pendiente de aprobación)', payload: qrPayload(registro) }];
+  const items = [{ label: aprobado ? 'REGISTRO, ENTRADA Y 9 COMIDAS' : 'REGISTRO (pendiente de aprobación)', payload: qrPayload(registro) }];
   const qrSize = 440;
-  const c = document.createElement('canvas'); c.width = W; c.height = 1400;
+  const c = document.createElement('canvas'); c.width = W; c.height = 1200;
   const ctx = c.getContext('2d');
-  ctx.fillStyle = '#F7FAF4'; ctx.fillRect(0,0,W,1400);
-  ctx.fillStyle = '#0C2117'; ctx.fillRect(0,0,W,120);
+  ctx.fillStyle = '#F5F8FA'; ctx.fillRect(0,0,W,1200);
+  ctx.fillStyle = '#1C2832'; ctx.fillRect(0,0,W,120);
   ctx.fillStyle = '#E8B23D'; ctx.textAlign = 'center';
   ctx.font = '48px "Archivo Black", Arial Black, sans-serif'; ctx.fillText((EV.nombre || '') + (EV.anio ? ' ' + EV.anio : ''), W/2, 62);
-  ctx.fillStyle = '#FFFBF2'; ctx.font = '26px Karla, Arial, sans-serif'; ctx.fillText(EV.tema || '', W/2, 100);
-  ctx.fillStyle = '#26231C'; ctx.font = 'bold 40px Karla, Arial, sans-serif';
+  ctx.fillStyle = '#F5F8FA'; ctx.font = '26px Karla, Arial, sans-serif'; ctx.fillText(EV.tema || '', W/2, 100);
+  ctx.fillStyle = '#1F2A33'; ctx.font = 'bold 40px Karla, Arial, sans-serif';
   let y = wrapText(ctx, registro.nombreCompleto, W/2, 190, W - pad*2, 48);
-  ctx.fillStyle = '#3F5E4B'; ctx.font = '30px Karla, Arial, sans-serif';
+  ctx.fillStyle = '#506476'; ctx.font = '30px Karla, Arial, sans-serif';
   y = wrapText(ctx, registro.iglesia || '', W/2, y + 4, W - pad*2, 38);
-  if(registro.familia){ ctx.font = '26px Karla, Arial, sans-serif'; y = wrapText(ctx, familiaTexto(registro), W/2, y + 2, W - pad*2, 34); }
   ctx.font = '56px "Archivo Black", Arial Black, sans-serif';
   const idW = ctx.measureText(registro.id).width + 80, idH = 92, idX = (W - idW)/2, idY = y + 6;
-  ctx.fillStyle = '#152A20'; ctx.beginPath();
+  ctx.fillStyle = '#243441'; ctx.beginPath();
   if(ctx.roundRect) ctx.roundRect(idX, idY, idW, idH, 46); else ctx.rect(idX, idY, idW, idH);
   ctx.fill();
   ctx.fillStyle = '#E8B23D'; ctx.textBaseline = 'middle'; ctx.fillText(registro.id, W/2, idY + idH/2 + 2); ctx.textBaseline = 'alphabetic';
@@ -237,12 +229,12 @@ function buildTicketCanvas(registro, aprobado){
     const q = qrCanvas(it.payload, qrSize);
     ctx.fillStyle = '#fff'; ctx.fillRect(cx - qrSize/2 - 36, y - 36, qrSize + 72, qrSize + 72);
     ctx.drawImage(q, cx - qrSize/2, y);
-    ctx.fillStyle = '#26231C'; ctx.font = 'bold 28px Karla, Arial, sans-serif';
+    ctx.fillStyle = '#1F2A33'; ctx.font = 'bold 28px Karla, Arial, sans-serif';
     ctx.fillText(it.label, cx, y + qrSize + 100);
   });
   const h = y + qrSize + 175;
-  ctx.fillStyle = '#3F5E4B'; ctx.font = '24px Karla, Arial, sans-serif';
-  ctx.fillText('Guarda esta imagen. La necesitarás en el retiro.', W/2, h - 30);
+  ctx.fillStyle = '#506476'; ctx.font = '24px Karla, Arial, sans-serif';
+  ctx.fillText('Guarda esta imagen. La necesitarás en el campamento.', W/2, h - 30);
   const out = document.createElement('canvas'); out.width = W; out.height = h;
   out.getContext('2d').drawImage(c, 0, 0);
   return out;
@@ -267,70 +259,17 @@ async function saveTicketImage(registro, aprobado, msgEl){
   const ov = document.createElement('div'); ov.className = 'photo-overlay';
   ov.innerHTML = `<p>Mantén presionada la imagen y elige <b>Guardar en Fotos</b> (o "Guardar imagen").</p>
     <img src="${url}" alt="Tus códigos">
-    <a class="primary" style="padding:12px 18px;border-radius:6px;text-decoration:none;background:var(--ember);color:#fff;" href="${url}" download="${registro.id}.png">Descargar imagen</a>
+    <a class="primary" style="padding:12px 18px;border-radius:6px;text-decoration:none;background:var(--ember);color:#2A2100;" href="${url}" download="${registro.id}.png">Descargar imagen</a>
     <button class="ghost" id="closePhotoOv">Cerrar</button>`;
   document.body.appendChild(ov);
   ov.querySelector('#closePhotoOv').onclick = () => { ov.remove(); URL.revokeObjectURL(url); };
   msgEl.textContent = '';
 }
 
-/* ---------- Edad el primer día del evento (fechaInicio en config.js) ---------- */
-const _fi = String(EV.fechaInicio || '').split('-').map(Number);
-const FECHA_CAMPAMENTO = _fi.length === 3 && _fi[0] ? new Date(_fi[0], _fi[1]-1, _fi[2]) : new Date();
-function edadDe(r){
-  const m = /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/.exec((r && r.fechaNacimiento) || '');
-  if(!m) return null;
-  const hoy = FECHA_CAMPAMENTO; let e = hoy.getFullYear() - (+m[1]);
-  if((hoy.getMonth()+1) < (+m[2]) || ((hoy.getMonth()+1) === (+m[2]) && hoy.getDate() < (+m[3]))) e--;
-  return (e >= 0 && e < 120) ? e : null;
-}
-
-/* ---------- Precio de cada persona ----------
-   Si config.js tiene "precios" (por edad), el precio depende de la edad el primer día del evento.
-   Si no, todos pagan precioTotal. Sin fecha de nacimiento válida se usa el precio de adulto (el más alto). */
-function tramoPorEdad(e){
-  if(!PRECIOS || e === null || e === undefined) return null;
-  return PRECIOS.find(p => e >= (Number(p.desde)||0) && (p.hasta == null || p.hasta === '' || e <= Number(p.hasta))) || null;
-}
-const PRECIO_ADULTO = PRECIOS ? Math.max.apply(null, PRECIOS.map(p=>Number(p.precio)||0)) : PRECIO_TOTAL;
-function precioPorEdad(e){ if(!PRECIOS) return PRECIO_TOTAL; if(e === null || e === undefined) return PRECIO_ADULTO; const t = tramoPorEdad(e); return t ? (Number(t.precio)||0) : PRECIO_TOTAL; }
-
-/* ---------- Registro por familia (calculadora de costo, opcional: calculadoraFamilia en config.js) ----------
-   r.familia = { pastor:'Juan', esposa:'María' | '', hijos:[{ nombre:'Ana', fechaNacimiento:'2015/03/02' }] }
-   El pastor y la esposa pagan precio de adulto; cada hijo según su edad el primer día del evento. */
-const CALCULADORA = !!EV.calculadoraFamilia;
-function detalleFamilia(f){
-  if(!f) return [];
-  const out = [{ rol:'Pastor', nombre:f.pastor || '', edad:null, precio:PRECIO_ADULTO }];
-  if(f.esposa) out.push({ rol:'Esposa', nombre:f.esposa, edad:null, precio:PRECIO_ADULTO });
-  (f.hijos || []).forEach(h => { const e = edadDe(h); out.push({ rol:'Hijo/a', nombre:h.nombre || '', edad:e, precio:precioPorEdad(e), fechaNacimiento:h.fechaNacimiento || '' }); });
-  return out;
-}
-function personasDe(r){ return (r && r.familia) ? detalleFamilia(r.familia).length : 1; }
-function familiaTexto(r){
-  if(!r || !r.familia) return '';
-  const d = detalleFamilia(r.familia);
-  return d.map(p => p.nombre + (p.rol === 'Hijo/a' ? (p.edad !== null ? ' (' + p.edad + ')' : '') : ' (' + p.rol.toLowerCase() + ')')).join(', ') + ' — ' + d.length + (d.length === 1 ? ' persona' : ' personas');
-}
-function nombreConFamilia(r){ const n = personasDe(r); return (r && r.nombreCompleto || '') + (n > 1 ? ' · familia de ' + n : ''); }
-/* Depósito que se pide: el monto de "reserva" o el total si es menor (ej.: pastor solo = L.600) */
-function depositoDe(total){ return RESERVA_ACTIVA ? Math.min(PRECIO_RESERVA, total) : total; }
-
-function precioDe(r){
-  if(r && r.familia) return detalleFamilia(r.familia).reduce((t,p)=>t + p.precio, 0);
-  if(!PRECIOS) return PRECIO_TOTAL;
-  return precioPorEdad(edadDe(r));
-}
-function categoriaDe(r){
-  if(r && r.familia) return 'Familia (' + personasDe(r) + ')';
-  const t = tramoPorEdad(edadDe(r)); return t ? (t.etiqueta || '') : '';
-}
-
-/* ---------- Pagos: reserva (depósito parcial) o pago completo ---------- */
+/* ---------- Pagos: reserva (L.300) o pago completo (L.1,500) ---------- */
 function pagoInfo(r){
-  const p = r && r.pago, precio = precioDe(r), res = Math.min(PRECIO_RESERVA, precio);
-  if(precio === 0 && r && r.estado === 'aprobado') return { clave:'completo', pagado:0, saldo:0, precio, texto:'Sin costo' };
-  if(p === 'completo') return { clave:'completo', pagado:precio, saldo:0, precio, texto:'Pago completo ' + lempiras(precio) };
-  if(p === 'reserva') return { clave:'reserva', pagado:res, saldo:precio-res, precio, texto:'Reserva ' + lempiras(res) + ' · debe ' + lempiras(precio-res) };
-  return { clave:'sin', pagado:0, saldo:precio, precio, texto:'Pago sin definir' };
+  const p = r && r.pago;
+  if(p === 'completo') return { clave:'completo', pagado:PRECIO_TOTAL, saldo:0, texto:'Pago completo ' + lempiras(PRECIO_TOTAL) };
+  if(p === 'reserva') return { clave:'reserva', pagado:PRECIO_RESERVA, saldo:PRECIO_TOTAL-PRECIO_RESERVA, texto:'Reserva ' + lempiras(PRECIO_RESERVA) + ' · debe ' + lempiras(PRECIO_TOTAL-PRECIO_RESERVA) };
+  return { clave:'sin', pagado:0, saldo:PRECIO_TOTAL, texto:'Pago sin definir' };
 }

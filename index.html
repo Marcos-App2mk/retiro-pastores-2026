@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Retiro de Pastores</title>
+<title>Campamento CIY</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Karla:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 <script src="config.js"></script>
@@ -11,19 +11,19 @@
 <style>
   :root{
     --theme-img:url("assets/banner.jpg");
-    --pine:#1E4A32;
-    --pine-dark:#11301F;
-    --moss:#3D7354;
-    --parchment:#0C2117;
-    --cream:#F7FAF4;
-    --ember:#2B7A4B;
-    --ember-dark:#1F5C38;
-    --wood:#3F5E4B;
+    --pine:#33495A;
+    --pine-dark:#243441;
+    --moss:#4F7184;
+    --parchment:#1C2832;
+    --cream:#F5F8FA;
+    --ember:#BF8A22;
+    --ember-dark:#A5741B;
+    --wood:#506476;
     --gold:#E8B23D;
-    --ink:#26231C;
-    --line:#CFDDCF;
+    --ink:#1F2A33;
+    --line:#C8D3DB;
     --bad:#B23A32;
-    --ok:#2B7A4B;
+    --ok:#3E7A66;
     --warn:#C68A1F;
   }
   *{box-sizing:border-box;}
@@ -57,7 +57,7 @@
     position:relative;
     height:150px;
     overflow:hidden;
-    background:var(--parchment);
+    background:#000;
     padding:0 28px;
   }
   .reflection-pool::before{
@@ -72,7 +72,7 @@
     -webkit-mask-image:linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0) 88%);
     mask-image:linear-gradient(to top, rgba(0,0,0,0.85), rgba(0,0,0,0) 88%);
   }
-  .reflection-pool svg.ridge{ display:block; position:absolute; bottom:-1px; left:0; width:100%; height:30px; fill:var(--parchment); z-index:2; }
+  .reflection-pool svg.ridge{ display:block; position:absolute; bottom:-1px; left:0; width:100%; height:30px; fill:#000; z-index:2; }
   .reflection-pool .sub-reflect.camp-info{ font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); font-weight:700; padding-top:78px; max-width:none; }
   .reflection-pool .camp-info span{ display:block; line-height:1.7; }
   .reflection-pool .camp-info .dot{ display:none; }
@@ -86,19 +86,12 @@
     margin-left:auto; margin-right:auto;
     text-shadow:0 2px 6px rgba(0,0,0,0.8);
   }
-  .banner-title{ position:absolute; left:0; right:0; top:7%; z-index:2; text-align:center; padding:0 70px; }
-  .banner-title .bt-kicker{ display:block; color:var(--gold); font-weight:700; font-size:clamp(10px,2.6vw,14px); letter-spacing:2px; text-transform:uppercase; text-shadow:0 2px 8px rgba(0,0,0,.8); }
-  .banner-title h1{ color:#fff; font-size:clamp(24px,7.2vw,44px); line-height:1.05; letter-spacing:.5px; margin-top:4px; text-shadow:0 3px 14px rgba(0,0,0,.75); }
-  .banner-title h1 span:last-child{ color:var(--gold); }
   .corner-badge{
     position:absolute; top:16px; right:16px; z-index:3;
-    background:#EAE7DC; border-radius:12px; padding:9px;
+    background:#E4EAEE; border-radius:12px; padding:9px;
     box-shadow:0 4px 12px rgba(0,0,0,0.35);
   }
   .corner-badge img{ width:52px; height:52px; display:block; }
-  /* Logo del retiro: abajo a la izquierda, más pequeño (logo horizontal) */
-  .corner-badge{ top:auto; right:auto; bottom:12px; left:12px; padding:5px 7px; border-radius:8px; background:#fff; }
-  .corner-badge img{ width:auto; height:26px; }
   .brand-center{ position:relative; z-index:2; }
   .brand-center .logo-img{
     width:88px; height:88px; display:block; margin:0 auto 12px;
@@ -106,7 +99,7 @@
   }
   .brand-center .kicker{ color:var(--gold); font-size:13px; margin:0 0 2px; letter-spacing:0.5px; text-shadow:0 2px 8px rgba(0,0,0,0.6); }
   .brand-center h1{ font-size:32px; line-height:1.1; letter-spacing:1px; text-shadow:0 2px 10px rgba(0,0,0,0.7); }
-  header.topo p.sub{ margin:14px auto 0; max-width:42ch; color:#EDEBDD; font-size:15px; position:relative; z-index:2; text-shadow:0 2px 8px rgba(0,0,0,0.7); }
+  header.topo p.sub{ margin:14px auto 0; max-width:42ch; color:#E8EEF2; font-size:15px; position:relative; z-index:2; text-shadow:0 2px 8px rgba(0,0,0,0.7); }
 
   .mode-tabs{
     display:flex; gap:8px; padding:16px 22px 0;
@@ -117,11 +110,11 @@
   }
   .mode-tabs button.active{ background:var(--pine); color:#fff; border-color:var(--pine); }
 
-  .how-btn{ display:block; text-align:center; margin:0 0 16px; padding:14px 12px; background:var(--ember); color:#fff !important; border-radius:12px; text-decoration:none; box-shadow:0 4px 0 rgba(0,0,0,.25); }
+  .how-btn{ display:block; text-align:center; margin:0 0 16px; padding:14px 12px; background:var(--ember); color:#2A2100 !important; border-radius:12px; text-decoration:none; box-shadow:0 4px 0 rgba(0,0,0,.25); }
   .how-btn:active{ transform:translateY(2px); box-shadow:0 2px 0 rgba(0,0,0,.25); }
   .how-btn .how-top{ display:block; font-size:19px; font-weight:800; letter-spacing:.2px; }
   .how-btn .how-sub{ display:block; font-size:14px; font-weight:600; opacity:.95; margin-top:2px; }
-  .deadline-note{ background:#FBF0D6; border-left:5px solid var(--gold); border-radius:6px; padding:12px 14px; margin:0 0 14px; font-size:15px; }
+  .deadline-note{ background:#FBE9D0; border-left:5px solid var(--ember); border-radius:6px; padding:12px 14px; margin:0 0 14px; font-size:15px; }
   .trail{ display:flex; justify-content:space-between; padding:0 28px; margin:18px 0 22px; }
   .trail .marker{ flex:1; text-align:center; position:relative; }
   .trail .marker::before{
@@ -130,11 +123,11 @@
     background:var(--cream); border:2px solid var(--line); color:var(--wood);
     font-family:'Archivo Black',sans-serif; font-size:14px; transition:all .2s ease;
   }
-  .trail .marker.active::before{ background:var(--ember); border-color:var(--ember-dark); color:#fff; }
+  .trail .marker.active::before{ background:var(--ember); border-color:var(--ember-dark); color:#2A2100; }
   .trail .marker.done::before{ content:"✓"; background:var(--moss); border-color:var(--moss); color:#fff; }
-  .trail .marker span{ font-size:12px; color:#D8CBB8; }
+  .trail .marker span{ font-size:12px; color:#C3D0DA; }
   .trail .marker.active span{ color:var(--gold); font-weight:700; }
-  .trail .marker.done span{ color:#B9C9BB; }
+  .trail .marker.done span{ color:#B5C9D6; }
 
   main{ padding:0 22px; }
   .card{ background:var(--cream); border:1px solid var(--line); border-radius:6px; padding:26px 24px; }
@@ -173,41 +166,19 @@
   input:focus, select:focus, button:focus-visible{ outline:3px solid var(--gold); outline-offset:1px; border-color:var(--wood); }
   .row3{ display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:10px; }
   .row2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-  /* Calculadora de costo */
-  .price-chips{ display:flex; flex-wrap:wrap; gap:6px; margin:0 0 16px; }
-  .price-chips span{ background:#fff; border:1px solid var(--line); border-radius:20px; padding:5px 11px; font-size:13px; color:var(--wood); }
-  .price-chips b{ color:var(--ink); }
-  .hijo-box{ border:1px solid var(--line); border-left:4px solid var(--gold); border-radius:6px; padding:12px 14px 2px; margin-bottom:12px; background:#fff; }
-  .hijo-box h4{ margin:0 0 8px; font-size:14px; color:var(--wood); }
-  .hijo-box .edad-note{ font-size:13px; color:var(--moss); margin:-6px 0 10px; min-height:1em; }
-  .calc-sum{ display:none; max-width:360px; margin:18px auto 6px; background:#EEF4EC; color:var(--ink); border:1px solid var(--line); border-radius:10px; padding:14px 16px; }
-  .calc-sum.show{ display:block; }
-  .calc-sum h4{ margin:0 0 6px; font-size:13px; letter-spacing:1px; text-transform:uppercase; color:var(--wood); }
-  .calc-sum table{ width:100%; border-collapse:collapse; font-size:14px; }
-  .calc-sum td{ padding:5px 0; border-bottom:1px solid rgba(30,74,50,.12); vertical-align:top; }
-  .calc-sum td.n{ text-align:right; white-space:nowrap; padding-left:10px; }
-  .calc-sum td small{ color:var(--wood); }
-  .calc-sum .tot td{ border-bottom:none; padding-top:9px; font-size:16px; font-weight:800; color:var(--pine-dark); }
-  .calc-sum .dep{ margin-top:10px; background:#FBF3DC; border:1px solid #E8D49A; color:var(--ink); border-radius:8px; padding:10px 12px; text-align:center; font-size:14px; }
-  .calc-sum .dep b{ display:block; font-size:24px; font-family:'Archivo Black',sans-serif; line-height:1.2; color:var(--ember-dark); }
-  .calc-sum .saldo{ font-size:13px; color:var(--wood); margin:8px 0 0; text-align:center; }
-  .calc-actions{ text-align:center; margin-top:18px; }
-  .deposit-amount{ background:#FBE9D0; border:2px solid var(--gold); border-radius:8px; padding:14px; text-align:center; margin:0 0 14px; }
-  .deposit-amount b{ display:block; font-size:30px; font-family:'Archivo Black',sans-serif; color:var(--ember-dark); line-height:1.2; }
-  .deposit-amount small{ display:block; color:var(--wood); font-size:13px; margin-top:4px; }
   .small-note{ font-size:12px; color:var(--wood); margin-top:6px; }
 
   .nav-buttons{ display:flex; justify-content:space-between; margin-top:26px; gap:12px; }
   button{ font-family:'Karla',sans-serif; font-weight:700; font-size:15px; border-radius:4px; padding:12px 20px; border:none; cursor:pointer; transition:transform .08s ease, background .15s ease; }
   button:active{ transform:translateY(1px); }
-  button.primary{ background:var(--ember); color:#fff; }
+  button.primary{ background:var(--ember); color:#2A2100; }
   button.primary:hover{ background:var(--ember-dark); }
-  button.primary:disabled{ background:#CBBFA0; color:#8a8067; cursor:not-allowed; }
+  button.primary:disabled{ background:#B4C0C9; color:#6B7A86; cursor:not-allowed; }
   button.ghost{ background:transparent; color:var(--wood); border:1.5px solid var(--line); }
   button.ghost:hover{ border-color:var(--wood); }
   button.small{ padding:8px 12px; font-size:13px; }
 
-  .upload-box{ border:2px dashed var(--line); border-radius:6px; padding:22px; text-align:center; background:#fffef9; cursor:pointer; }
+  .upload-box{ border:2px dashed var(--line); border-radius:6px; padding:22px; text-align:center; background:#FBFDFE; cursor:pointer; }
   .upload-box:hover{ border-color:var(--ember); }
   .upload-box img{ max-width:100%; max-height:220px; border-radius:4px; margin-top:12px; }
   .upload-box .placeholder{ color:var(--wood); font-size:14px; }
@@ -215,7 +186,7 @@
 
   .verify-row{ display:flex; gap:12px; align-items:center; margin-top:14px; flex-wrap:wrap; }
   .result-box{ margin-top:16px; padding:14px 16px; border-radius:5px; font-size:14px; display:none; }
-  .result-box.ok{ background:#E6F0E6; border:1px solid var(--moss); color:#254a30; display:block; }
+  .result-box.ok{ background:#E3F0EC; border:1px solid var(--moss); color:#25483C; display:block; }
   .result-box.fail{ background:#F8E3DC; border:1px solid var(--ember); color:#7A2E17; display:block; }
   .result-box.working{ background:#FBF3DD; border:1px solid var(--gold); color:#6a4f10; display:block; }
   .result-box strong{ display:block; margin-bottom:4px; }
@@ -232,7 +203,7 @@
   .ticket .qr-holder{ flex:0 0 auto; background:#fff; padding:8px; border-radius:4px; border:1px solid var(--line); }
   .ticket .info h3{ font-size:16px; color:var(--pine-dark); margin-bottom:4px; }
   .ticket .info p{ margin:2px 0; font-size:13px; color:var(--wood); }
-  .ticket .info .id-code{ font-family:monospace; font-size:12px; background:#F0E9D2; padding:2px 6px; border-radius:3px; }
+  .ticket .info .id-code{ font-family:monospace; font-size:12px; background:#E8EEF2; padding:2px 6px; border-radius:3px; }
 
   .meals-title{ font-size:16px; color:var(--pine-dark); margin:22px 0 12px; }
   .meals-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
@@ -294,7 +265,7 @@
   .camper-row h3{ font-size:15px; color:var(--pine-dark); margin-bottom:2px; }
   .camper-row p{ margin:2px 0; font-size:13px; color:var(--wood); }
   .badge{ font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap; }
-  .badge.aprobado{ background:#E6F0E6; color:var(--ok); }
+  .badge.aprobado{ background:#E3F0EC; color:var(--ok); }
   .badge.pendiente{ background:#FBF0DA; color:var(--warn); }
   .badge.rechazado{ background:#F8E3DC; color:var(--bad); }
   .camper-row .thumb{ width:54px; height:54px; object-fit:cover; border-radius:4px; border:1px solid var(--line); cursor:pointer; }
@@ -302,18 +273,18 @@
   .camper-row .row-actions button{ flex:1; min-width:90px; }
   .tick-status{ font-size:12px; color:var(--wood); margin-top:6px; }
 
-  .modal-overlay{ position:fixed; inset:0; background:rgba(21,42,32,0.82); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
+  .modal-overlay{ position:fixed; inset:0; background:rgba(28,40,50,0.82); display:none; align-items:center; justify-content:center; z-index:50; padding:20px; }
   .modal-overlay.active{ display:flex; }
   .modal-box{ background:var(--cream); border-radius:8px; padding:20px; max-width:440px; width:100%; max-height:88vh; overflow:auto; }
   .modal-box img{ width:100%; border-radius:5px; margin:12px 0; border:1px solid var(--line); }
-  .modal-box .ai-note{ font-size:13px; background:#F0EADA; padding:10px 12px; border-radius:5px; margin-bottom:10px; }
+  .modal-box .ai-note{ font-size:13px; background:#E8EEF2; padding:10px 12px; border-radius:5px; margin-bottom:10px; }
   .modal-close{ display:flex; justify-content:flex-end; }
 
   .scanner-panel{ text-align:center; }
   .scanner-panel video{ width:100%; max-width:360px; border-radius:8px; background:#000; }
   .scan-status{ margin:16px auto; padding:14px; border-radius:6px; font-weight:700; font-size:15px; max-width:360px; }
-  .scan-status.idle{ background:#F0EADA; color:var(--wood); }
-  .scan-status.ok{ background:#E6F0E6; color:var(--ok); }
+  .scan-status.idle{ background:#E8EEF2; color:var(--wood); }
+  .scan-status.ok{ background:#E3F0EC; color:var(--ok); }
   .scan-status.fail{ background:#F8E3DC; color:var(--bad); }
   .scan-status.warn{ background:#FBF0DA; color:var(--warn); }
   .scan-log{ text-align:left; max-width:360px; margin:0 auto; font-size:12px; color:var(--wood); max-height:140px; overflow:auto; }
@@ -339,12 +310,11 @@
 <div class="app">
   <header class="topo">
     <div class="corner-badge"><img class="logo-img" src="assets/logo.png" data-ev-img="logo" alt="Logo"></div>
-    <div class="banner-title" data-si="tituloBanner"><span class="bt-kicker" data-ev="tema"></span><h1><span data-ev="nombre"></span> <span data-ev="anio"></span></h1></div>
     <svg class="ridge" viewBox="0 0 600 40" preserveAspectRatio="none"><path d="M0,40 C150,4 450,4 600,40 L600,40 L0,40 Z"></path></svg>
   </header>
 
   <div class="reflection-pool">
-    <p class="sub-reflect camp-info"><span data-ev="fechaTexto">30 de noviembre al 3 de diciembre de 2026</span><span class="dot">·</span><span data-ev="lugar">Campamento Extremo, Lago de Yojoa</span></p>
+    <p class="sub-reflect camp-info"><span data-ev="fechaTexto">6 de enero de 2027</span><span class="dot">·</span><span data-ev="lugar">Campamento Bagope</span></p>
     <svg class="ridge" viewBox="0 0 600 40" preserveAspectRatio="none"><path d="M0,40 C150,4 450,4 600,40 L600,40 L0,40 Z"></path></svg>
   </div>
 
@@ -358,7 +328,6 @@
   <!-- CAMPER VIEW -->
   <div class="view active" id="viewCampista">
     <nav class="trail" id="trail">
-      <div class="marker" data-n="0" data-step="0" data-si="calculadora"><span>Costo</span></div>
       <div class="marker active" data-n="1" data-step="1"><span>Pago</span></div>
       <div class="marker" data-n="2" data-step="2"><span>Datos</span></div>
       <div class="marker" data-n="3" data-step="3"><span>Iglesia</span></div>
@@ -368,30 +337,11 @@
     <main>
       <div class="card" id="formCard">
 
-        <section class="step" id="step0" data-si="calculadora">
-          <a href="instrucciones" class="how-btn"><span class="how-top">📋 ¿Primera vez?</span><span class="how-sub">Mira los pasos para registrarte</span></a>
-          <h2>Calcula el costo de tu familia</h2>
-          <p class="hint">Escribe quiénes de tu familia asistirán. El costo se calcula con la edad de cada hijo el primer día del retiro (<span data-ev="fechaTexto"></span>).</p>
-          <div class="price-chips" id="priceChips"></div>
-          <div class="field"><label for="calcPastor">Primer nombre del pastor</label><input type="text" id="calcPastor" autocomplete="given-name" oninput="calcActualizar()"></div>
-          <div class="field"><label for="calcEsposa">Primer nombre de la esposa <span style="font-weight:400;">(déjalo vacío si no asistirá)</span></label><input type="text" id="calcEsposa" oninput="calcActualizar()"></div>
-          <div class="field"><label for="calcNumHijos">¿Cuántos hijos asistirán?</label>
-            <select id="calcNumHijos" onchange="calcHijos()"><option value="">Selecciona…</option><option value="0">Ninguno</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
-          </div>
-          <div id="calcHijosBox"></div>
-          <div class="calc-actions" id="calcBtnBox"><button class="primary" onclick="calcMostrar()">Calcular el costo</button></div>
-          <div class="calc-sum" id="calcResumen"></div>
-          <div class="nav-buttons" id="calcContinuar" style="display:none;"><span></span><button class="primary" onclick="goNext(0)">Continuar al depósito</button></div>
-        </section>
-
         <section class="step active" id="step1">
-          <a href="instrucciones" class="how-btn" data-si="sinCalculadora"><span class="how-top">📋 ¿Primera vez?</span><span class="how-sub">Mira los pasos para registrarte</span></a>
+          <a href="instrucciones" class="how-btn"><span class="how-top">📋 ¿Primera vez?</span><span class="how-sub">Mira los pasos para registrarte</span></a>
           <h2>Tu depósito</h2>
-          <div class="deposit-amount" id="montoDeposito" data-si="calculadora"></div>
           <div class="deadline-note">⏰ Debes hacer tu depósito y registrarte a más tardar el <b data-ev="fechaLimite">23 de diciembre de 2026</b>.</div>
-          <p class="hint" data-si="precios sinCalculadora"><b>Costo por persona</b> (según su edad el primer día del evento): <span data-ev="listaPrecios"></span>.</p>
-          <p class="hint">Primero haz tu depósito<span data-si="reserva sinCalculadora"> de <b data-ev="reserva">L.300</b> (reserva) o el pago completo</span><span data-si="precioUnico"> de <b data-ev="precioTotal">L.1,500</b></span>. Luego sube aquí la foto o captura de tu comprobante. Un administrador lo revisará y aprobará tu registro.</p>
-          <p class="hint" data-si="notaPago"><b data-ev="notaPago"></b></p>
+          <p class="hint">Primero haz tu depósito de <b data-ev="reserva">L.300</b> (reserva) o el pago completo de <b data-ev="precioTotal">L.1,500</b>. Luego sube aquí la foto o captura de tu comprobante. Un administrador lo revisará y aprobará tu registro.</p>
           <img src="assets/bank.jpg" data-ev-img="banco" alt="Datos para el depósito" style="display:block;width:100%;max-width:220px;margin:0 auto 14px;border-radius:8px;">
           <div class="field">
             <div class="upload-box" id="uploadBox" onclick="document.getElementById('paymentFile').click()">
@@ -400,11 +350,11 @@
             </div>
             <input type="file" id="paymentFile" accept="image/*" onchange="onFileChosen(event)">
           </div>
-          <div class="nav-buttons"><span data-si="sinCalculadora"></span><button class="ghost" data-si="calculadora" onclick="goToStep(0)">Atrás</button><button class="primary" id="nextPayBtn" onclick="goNext(1)" disabled>Siguiente</button></div>
+          <div class="nav-buttons"><span></span><button class="primary" id="nextPayBtn" onclick="goNext(1)" disabled>Siguiente</button></div>
         </section>
 
         <section class="step" id="step2">
-          <h2><span data-si="sinCalculadora">Datos del participante</span><span data-si="calculadora">Datos del pastor</span></h2>
+          <h2>Datos del campista</h2>
           <p class="hint">Escribe el nombre tal como aparece en tu documento de identidad.</p>
           <div class="row2">
             <div class="field"><label for="primerNombre">Primer nombre</label><input type="text" id="primerNombre" required></div>
@@ -428,24 +378,24 @@
             <input type="tel" id="telefono" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="98765432" autocomplete="tel-national" oninput="this.value=this.value.replace(/\D/g,'')" required>
             <p class="small-note">Solo lo usaremos para contactarte si hace falta.</p>
           </div>
-          <div class="field" data-si="emergencia">
+          <div class="field">
             <label for="contactoEmergencia">Contacto de emergencia (nombre)</label>
-            <input type="text" id="contactoEmergencia" placeholder="Nombre de un familiar o amigo" required>
+            <input type="text" id="contactoEmergencia" placeholder="Nombre de mamá, papá o encargado" required>
           </div>
-          <div class="field" data-si="emergencia">
+          <div class="field">
             <label for="telEmergencia">Número de emergencia (8 dígitos)</label>
             <input type="tel" id="telEmergencia" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="98765432" oninput="this.value=this.value.replace(/\D/g,'')" required>
           </div>
-          <div class="field" data-si="bautizo">
+          <div class="field">
             <label for="bautizado">¿Estás bautizado?</label>
             <select id="bautizado" required><option value="">Selecciona…</option><option value="Sí">Sí</option><option value="No">No</option></select>
           </div>
           <div class="field">
-            <label for="alergiasSel"><span data-si="sinCalculadora">¿Tienes alergias?</span><span data-si="calculadora">¿Alguien de tu familia tiene alergias?</span></label>
+            <label for="alergiasSel">¿Tienes alergias?</label>
             <select id="alergiasSel" required onchange="toggleAlergias()"><option value="">Selecciona…</option><option value="No">No</option><option value="Sí">Sí</option></select>
           </div>
           <div class="field" id="alergiasBox" style="display:none;">
-            <label for="alergiasTxt"><span data-si="sinCalculadora">¿A qué eres alérgico?</span><span data-si="calculadora">¿Quién y a qué es alérgico?</span></label>
+            <label for="alergiasTxt">¿A qué eres alérgico?</label>
             <input type="text" id="alergiasTxt" placeholder="Ej: maní, mariscos, penicilina, picaduras de abeja">
           </div>
           <div class="nav-buttons"><button class="ghost" onclick="goToStep(1)">Atrás</button><button class="primary" onclick="goNext(2)">Siguiente</button></div>
@@ -454,8 +404,8 @@
         <section class="step" id="step3">
           <h2>Información de tu iglesia</h2>
           <p class="hint">Nos ayuda a organizar los grupos por congregación.</p>
-          <div class="field"><label for="iglesia">Nombre o local de la iglesia</label><input type="text" id="iglesia" required></div>
-          <div class="field" data-si="sinCalculadora"><label for="encargado">Pastor o líder de jóvenes <span style="font-weight:400;">(opcional)</span></label><input type="text" id="encargado"></div>
+          <div class="field"><label for="iglesia">Nombre de la iglesia</label><input type="text" id="iglesia" required></div>
+          <div class="field"><label for="encargado">Pastor o líder de jóvenes <span style="font-weight:400;">(opcional)</span></label><input type="text" id="encargado"></div>
           <div class="nav-buttons"><button class="ghost" onclick="goToStep(2)">Atrás</button><button class="primary" id="submitBtn" onclick="enviarDesdePaso3()">Enviar registro</button></div>
         </section>
 
@@ -486,99 +436,6 @@
 <script>
 aplicarEvento();
 let paymentData = null;
-let familiaCalc = null;   // resultado de la calculadora (si está activa)
-
-/* ---------- Calculadora de costo por familia ---------- */
-/* Fecha de 3 casillas (año, mes, día) → 'AAAA/MM/DD'; '' si está incompleta o no existe (ej. 31 de febrero) */
-function fechaDeCasillas(a, m, d){
-  a = parseInt(a); m = parseInt(m); d = parseInt(d);
-  if(!a || !m || !d || a < 1900 || a > 2100 || m < 1 || m > 12 || d < 1 || d > 31) return '';
-  const f = new Date(a, m-1, d); if(f.getMonth() !== m-1 || f.getDate() !== d) return '';
-  if(f > FECHA_CAMPAMENTO) return '';
-  return `${a}/${String(m).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
-}
-function fechaDeInput(v){ const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v || ''); return m ? `${m[1]}/${m[2]}/${m[3]}` : ''; }
-function calcHijos(){
-  const box = document.getElementById('calcHijosBox');
-  const n = parseInt(document.getElementById('calcNumHijos').value) || 0;
-  const prev = [...box.querySelectorAll('.hijo-box')].map(b => ({ n: b.querySelector('.h-nombre').value, a: b.querySelector('.h-anio').value, m: b.querySelector('.h-mes').value, d: b.querySelector('.h-dia').value }));
-  let html = '';
-  for(let i = 0; i < n; i++){
-    html += `<div class="hijo-box">
-      <h4>Hijo/a ${i+1}</h4>
-      <div class="field"><label for="hN${i}">Primer nombre</label><input type="text" id="hN${i}" class="h-nombre" oninput="calcActualizar()"></div>
-      <div class="field">
-        <label for="hA${i}">Fecha de nacimiento (Año/Mes/Día)</label>
-        <div class="row3">
-          <input type="number" id="hA${i}" class="h-anio" placeholder="Año" min="1990" max="2100" inputmode="numeric" oninput="calcActualizar()">
-          <input type="number" id="hM${i}" class="h-mes" placeholder="Mes" min="1" max="12" inputmode="numeric" oninput="calcActualizar()">
-          <input type="number" id="hD${i}" class="h-dia" placeholder="Día" min="1" max="31" inputmode="numeric" oninput="calcActualizar()">
-        </div>
-        <p class="small-note">Ejemplo: 2015/08/05</p>
-      </div>
-      <div class="edad-note" id="hE${i}"></div>
-    </div>`;
-  }
-  box.innerHTML = html;
-  prev.slice(0, n).forEach((p, i) => { document.getElementById('hN'+i).value = p.n; document.getElementById('hA'+i).value = p.a; document.getElementById('hM'+i).value = p.m; document.getElementById('hD'+i).value = p.d; });
-  calcActualizar();
-}
-function calcLeer(){
-  const hijos = [...document.querySelectorAll('#calcHijosBox .hijo-box')].map(b => ({ nombre: b.querySelector('.h-nombre').value.trim(), fechaNacimiento: fechaDeCasillas(b.querySelector('.h-anio').value, b.querySelector('.h-mes').value, b.querySelector('.h-dia').value), _incompleta: !b.querySelector('.h-anio').value || !b.querySelector('.h-mes').value || !b.querySelector('.h-dia').value }));
-  return { pastor: document.getElementById('calcPastor').value.trim(), esposa: document.getElementById('calcEsposa').value.trim(), hijos };
-}
-function calcActualizar(){
-  const f = calcLeer();
-  f.hijos.forEach((h, i) => {
-    const e = edadDe(h), el = document.getElementById('hE'+i); if(!el) return;
-    if(!h.fechaNacimiento){ el.textContent = h._incompleta ? '' : 'Revisa la fecha de nacimiento.'; return; }
-    if(e === null){ el.textContent = 'Revisa la fecha de nacimiento.'; return; }
-    const p = precioPorEdad(e);
-    el.textContent = `Tendrá ${e} ${e === 1 ? 'año' : 'años'} al iniciar el retiro · ${p === 0 ? 'Gratis' : lempiras(p)}${e >= 18 ? ' (precio de adulto)' : ''}`;
-  });
-  const d = detalleFamilia({ pastor: f.pastor || 'Pastor', esposa: f.esposa, hijos: f.hijos });
-  const total = d.reduce((t,p)=>t + p.precio, 0), dep = depositoDe(total);
-  // Si ya se mostró el total y cambian algo, se oculta hasta que vuelvan a calcular
-  calcOcultar();
-  return { familia: f, total, deposito: dep, detalle: d };
-}
-function calcOcultar(){
-  const box = document.getElementById('calcResumen'); if(!box || !box.classList.contains('show')) return;
-  box.classList.remove('show'); box.innerHTML = '';
-  document.getElementById('calcContinuar').style.display = 'none';
-  document.getElementById('calcBtnBox').style.display = '';
-}
-function calcValidar(r){
-  const f = r.familia;
-  if(!f.pastor){ document.getElementById('calcPastor').focus(); toast('Escribe el primer nombre del pastor.'); return false; }
-  if(document.getElementById('calcNumHijos').value === ''){ document.getElementById('calcNumHijos').focus(); toast('Indica cuántos hijos asistirán (o "Ninguno").'); return false; }
-  for(let i = 0; i < f.hijos.length; i++){
-    if(!f.hijos[i].nombre){ document.getElementById('hN'+i).focus(); toast('Escribe el nombre del hijo/a ' + (i+1) + '.'); return false; }
-    if(edadDe(f.hijos[i]) === null){ document.getElementById('hA'+i).focus(); toast('Revisa la fecha de nacimiento del hijo/a ' + (i+1) + '.'); return false; }
-  }
-  return true;
-}
-function calcMostrar(){
-  const r = calcActualizar();
-  if(!calcValidar(r)) return;
-  const d = r.detalle, total = r.total, dep = r.deposito;
-  const box = document.getElementById('calcResumen');
-  box.innerHTML = `<h4>Costo de tu familia</h4><table>
-    ${d.map(p => `<tr><td>${esc(p.nombre)} <small>· ${p.rol}${p.rol === 'Hijo/a' ? ', ' + p.edad + ' años' + (p.edad >= 18 ? ' · adulto' : '') : ''}</small></td><td class="n">${p.precio === 0 ? 'Gratis' : lempiras(p.precio)}</td></tr>`).join('')}
-    <tr class="tot"><td>Total</td><td class="n">${lempiras(total)}</td></tr></table>
-    <div class="dep">Depósito para registrarte<b>${lempiras(dep)}</b></div>
-    ${total > dep ? `<p class="saldo">Saldo de ${lempiras(total - dep)} a pagar en el retiro (o deposita el total de ${lempiras(total)} desde ya).</p>` : ''}`;
-  box.classList.add('show');
-  document.getElementById('calcBtnBox').style.display = 'none';
-  document.getElementById('calcContinuar').style.display = '';
-  box.scrollIntoView({ behavior:'smooth', block:'center' });
-}
-function calcInit(){
-  if(!CALCULADORA) return;
-  document.getElementById('priceChips').innerHTML = (PRECIOS || []).slice().sort((a,b)=>(Number(b.precio)||0)-(Number(a.precio)||0)).map(p => `<span>${esc(p.etiqueta || '')}: <b>${(Number(p.precio)||0) === 0 ? 'Gratis' : lempiras(p.precio)}</b></span>`).join('');
-  calcActualizar();
-  goToStep(0);
-}
 let verification = null;
 let currentStep = 1;
 
@@ -611,22 +468,15 @@ function toggleAlergias(){
 }
 
 function goNext(fromStep){
-  if(fromStep === 0){
-    const r = calcActualizar(), f = r.familia;
-    if(!calcValidar(r)) return;
-    familiaCalc = r;
-    document.getElementById('montoDeposito').innerHTML = `Deposita<b>${lempiras(r.deposito)}</b><small>Total de tu familia: ${lempiras(r.total)} · ${personasDe({familia:f})} ${personasDe({familia:f}) === 1 ? 'persona' : 'personas'}${r.total > r.deposito ? ' · saldo de ' + lempiras(r.total - r.deposito) + ' en el retiro' : ''}</small>`;
-    const pn = document.getElementById('primerNombre'); if(!pn.value) pn.value = f.pastor;
-    goToStep(1);
-  } else if(fromStep === 1){
+  if(fromStep === 1){
     if(!paymentData){ toast('Sube primero la foto de tu comprobante de depósito.'); return; }
     goToStep(2);
   } else if(fromStep === 2){
-    const req = ['primerNombre','segundoNombre','primerApellido','segundoApellido','anio','mes','dia','telefono'].concat(PEDIR_EMERGENCIA ? ['contactoEmergencia','telEmergencia'] : [], PEDIR_BAUTIZO ? ['bautizado'] : [], ['alergiasSel']);
+    const req = ['primerNombre','segundoNombre','primerApellido','segundoApellido','anio','mes','dia','telefono','contactoEmergencia','telEmergencia','bautizado','alergiasSel'];
     for(const id of req){ const el = document.getElementById(id); if(!el.value){ el.focus(); return; } }
     if(!/^\d{8}$/.test(document.getElementById('telefono').value)){ document.getElementById('telefono').focus(); toast('El teléfono debe tener exactamente 8 dígitos.'); return; }
-    if(PEDIR_EMERGENCIA && !/^\d{8}$/.test(document.getElementById('telEmergencia').value)){ document.getElementById('telEmergencia').focus(); toast('El número de emergencia debe tener exactamente 8 dígitos.'); return; }
-    if(document.getElementById('alergiasSel').value === 'Sí' && !document.getElementById('alergiasTxt').value.trim()){ document.getElementById('alergiasTxt').focus(); toast(CALCULADORA ? 'Escribe quién y a qué es alérgico.' : 'Escribe a qué eres alérgico.'); return; }
+    if(!/^\d{8}$/.test(document.getElementById('telEmergencia').value)){ document.getElementById('telEmergencia').focus(); toast('El número de emergencia debe tener exactamente 8 dígitos.'); return; }
+    if(document.getElementById('alergiasSel').value === 'Sí' && !document.getElementById('alergiasTxt').value.trim()){ document.getElementById('alergiasTxt').focus(); toast('Escribe a qué eres alérgico.'); return; }
     const mes = parseInt(document.getElementById('mes').value);
     const dia = parseInt(document.getElementById('dia').value);
     if(mes < 1 || mes > 12){ alert('El mes debe estar entre 1 y 12.'); return; }
@@ -637,7 +487,7 @@ function goNext(fromStep){
 
 function enviarDesdePaso3(){
   const iglesia = document.getElementById('iglesia');
-  if(!iglesia.value.trim()){ iglesia.focus(); toast('Escribe el nombre o local de tu iglesia.'); return; }
+  if(!iglesia.value.trim()){ iglesia.focus(); toast('Escribe el nombre de tu iglesia.'); return; }
   enviarRegistro();
 }
 
@@ -730,12 +580,6 @@ async function enviarRegistro(){
     comidas: MEALS.map(()=>({usado:false, hora:null})),
     creado: new Date().toISOString()
   };
-  if(CALCULADORA && familiaCalc){
-    const fc = familiaCalc.familia;
-    registro.familia = { pastor: fc.pastor, esposa: fc.esposa, hijos: fc.hijos.map(h => ({ nombre: h.nombre, fechaNacimiento: h.fechaNacimiento })) };
-    registro.costoFamilia = familiaCalc.total;
-    registro.depositoRequerido = familiaCalc.deposito;
-  }
 
   const comprobante = registro.comprobanteImagen;
   const slim = Object.assign({}, registro); delete slim.comprobanteImagen; slim.tieneComprobante = true;
@@ -790,13 +634,12 @@ function renderConfirmationInto(container, registro, isFreshSubmit){
       <div class="id-big">${esc(registro.id)}</div>
       <p class="qr-name">${esc(registro.nombreCompleto)}</p>
       <p class="qr-church">${esc(registro.iglesia)}</p>
-      ${registro.familia ? `<p class="qr-church">${esc(familiaTexto(registro))}</p>` : ''}
       <p class="qr-note">Un solo código para registrarte en la mesa de entrada y para las ${MEALS.length} comidas.</p>
     </div>
     ${saveBoxHtml(uid)}
     <div class="confirm-actions">
       <button class="ghost" onclick="window.print()">Imprimir</button>
-      ${isFreshSubmit ? '<button class="primary" onclick="location.reload()">Hacer otro registro</button>' : ''}
+      ${isFreshSubmit ? '<button class="primary" onclick="location.reload()">Registrar otro campista</button>' : ''}
     </div>
     </div>`;
   wireSaveButton(uid, registro, true);
@@ -813,19 +656,18 @@ function renderPendingInto(container, registro, isFreshSubmit){
   container.innerHTML = `
     <div class="pending-box card">
       <h2>Registro enviado</h2>
-      <p class="hint" style="margin-top:10px;">Tu comprobante quedó pendiente de revisión manual por un administrador del retiro.${isFreshSubmit ? ' Este código también quedó guardado en la pestaña "Mis códigos" de este teléfono.' : ''}</p>
+      <p class="hint" style="margin-top:10px;">Tu comprobante quedó pendiente de revisión manual por un administrador del campamento.${isFreshSubmit ? ' Este código también quedó guardado en la pestaña "Mis códigos" de este teléfono.' : ''}</p>
       <div class="qr-card">
         <div class="qr-frame"><div class="qr-holder" id="${uid}-registro"></div></div>
         <div class="code-label">Tu código</div>
         <div class="id-big">${esc(registro.id)}</div>
         <p class="qr-name">${esc(registro.nombreCompleto)}</p>
-        ${registro.familia ? `<p class="qr-church">${esc(familiaTexto(registro))}</p>` : ''}
       </div>
       <p class="hint">Este es tu código único. En la mesa de entrada, un administrador lo escaneará para revisar tu comprobante y aprobar tu registro. Ya aprobado, el mismo código sirve para las ${MEALS.length} comidas. También puedes tocar el botón para ver si ya fue aprobado.</p>
       ${saveBoxHtml(uid)}
       <div class="confirm-actions">
         <button class="primary" onclick="checkPendingStatus('${registro.id}', '${container.id}')">Verificar si ya fue aprobado</button>
-        ${isFreshSubmit ? '<button class="ghost" onclick="location.reload()">Hacer otro registro</button>' : ''}
+        ${isFreshSubmit ? '<button class="ghost" onclick="location.reload()">Registrar otro campista</button>' : ''}
       </div>
       <div class="pending-check-result small-note"></div>
     </div>`;
@@ -845,7 +687,7 @@ async function checkPendingStatus(id, containerId){
     const record = res ? JSON.parse(res.value) : null;
     if(!record){ out.textContent = 'No se encontró el registro.'; return; }
     if(record.estado === 'aprobado'){ renderConfirmationInto(container, record, containerId === 'step4'); }
-    else if(record.estado === 'rechazado'){ out.textContent = 'Tu registro fue rechazado. Consulta con un administrador del retiro.'; }
+    else if(record.estado === 'rechazado'){ out.textContent = 'Tu registro fue rechazado. Consulta con un administrador del campamento.'; }
     else { out.textContent = 'Todavía está pendiente de revisión. Intenta de nuevo más tarde.'; }
   }catch(e){ out.textContent = 'No se pudo consultar en este momento.'; }
 }
@@ -941,10 +783,6 @@ async function showMyTicket(id){
   detail.scrollIntoView({ behavior: 'smooth' });
 }
 
-
-/* Calculadora al inicio (si está activa) y numeración de los pasos visibles */
-calcInit();
-(function(){ let n = 1; document.querySelectorAll('.trail .marker').forEach(m => { if(m.style.display !== 'none') m.dataset.n = n++; }); })();
 </script>
 </body>
 </html>
