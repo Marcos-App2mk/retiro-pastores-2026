@@ -377,6 +377,9 @@ window.jsqrReady = new Promise(function(resolve){
   .scan-result{ position:fixed; inset:0; z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; color:#fff; cursor:pointer; }
   .scan-result.show{ display:flex; }
   .scan-result.ok{ background:#1F7A3A; } .scan-result.warn{ background:#B8741A; } .scan-result.fail{ background:#B0301F; }
+  /* Colores del registro/escaneo: verde = aprobado y pagado; amarillo = aprobado, debe saldo;
+     naranja = depósito pendiente de aprobación; rojo = rechazado, ya usado o no encontrado */
+  .scan-result.deposit{ background:#E8B90F; color:#2A2100; } .scan-result.pending{ background:#D9661F; }
   .scan-result .big-ico{ font-size:120px; line-height:1; font-weight:800; }
   .scan-result .sr-title{ font-size:30px; font-weight:800; margin:10px 0 6px; letter-spacing:.5px; text-transform:uppercase; }
   .scan-result .sr-name{ font-size:24px; font-weight:700; }
@@ -1016,7 +1019,7 @@ function hideScanResult(){ const el=document.getElementById('scanResult'); if(el
 function showScanResult(kind, title, name, sub){
   const el = document.getElementById('scanResult'); if(!el) return;
   el.className = 'scan-result show ' + kind;
-  document.getElementById('srIco').textContent = kind === 'ok' ? '✓' : kind === 'warn' ? '!' : '✕';
+  document.getElementById('srIco').textContent = kind === 'ok' ? '✓' : kind === 'deposit' ? '$' : (kind === 'warn' || kind === 'pending') ? '!' : '✕';
   document.getElementById('srTitle').textContent = title || '';
   document.getElementById('srName').textContent = name || '';
   document.getElementById('srSub').textContent = sub || '';
@@ -1025,10 +1028,11 @@ function showScanResult(kind, title, name, sub){
     const AC = window.AudioContext || window.webkitAudioContext; const ac = new AC(); const o = ac.createOscillator(), g = ac.createGain();
     o.frequency.value = kind === 'ok' ? 880 : 300; o.connect(g); g.connect(ac.destination); g.gain.value = .15; o.start(); o.stop(ac.currentTime + (kind==='ok'?.15:.35));
   }catch(e){}
-  clearTimeout(srTimer); srTimer = setTimeout(hideScanResult, kind === 'ok' ? 1500 : 2600);
+  const ms = (document.getElementById('mealSelect') || {}).value === 'e' ? 4000 : 2500; // entrada: 4 s · comidas: 2.5 s
+  clearTimeout(srTimer); srTimer = setTimeout(hideScanResult, ms);
 }
 function logScan(kind, msg, res){
-  setScanStatus(kind === 'ok' ? 'ok' : kind === 'warn' ? 'warn' : 'fail', msg);
+  setScanStatus(kind === 'ok' ? 'ok' : (kind === 'warn' || kind === 'deposit' || kind === 'pending') ? 'warn' : 'fail', msg);
   if(res) showScanResult(kind, res.title, res.name, res.sub);
   const log = document.getElementById('scanLog');
   const line = document.createElement('div');
@@ -1054,7 +1058,7 @@ async function handleScannedPayload(text){
     return;
   }
   if(record.estado === 'pendiente'){
-    logScan('warn', `PENDIENTE de aprobación — ${record.nombreCompleto}. Abriendo revisión…`,{title:'Pendiente de aprobación', name:nombreConFamilia(record), sub:'Abriendo revisión…'});
+    logScan('pending', `PENDIENTE de aprobación — ${record.nombreCompleto}. Abriendo revisión…`,{title:'Pendiente de aprobación', name:nombreConFamilia(record), sub:'Abriendo revisión…'});
     closeScanner();
     await loadRegistrations();
     openModal(record.id);
@@ -1062,7 +1066,7 @@ async function handleScannedPayload(text){
   }
   const pg = pagoInfo(record);
   const payNote = pg.clave === 'completo' ? (pg.precio === 0 ? '✓ SIN COSTO' : '✓ PAGADO') : pg.clave === 'reserva' ? `⚠ DEBE ${lempiras(pg.saldo)} (solo reserva)` : '⚠ PAGO SIN DEFINIR';
-  const payKind = pg.clave === 'completo' ? 'ok' : 'warn';
+  const payKind = pg.clave === 'completo' ? 'ok' : 'deposit';
   if(record.estado !== 'aprobado'){
     logScan('fail', `RECHAZADO — ${record.nombreCompleto}. No permitir el ingreso.`,{title:'Rechazado', name:nombreConFamilia(record), sub:'No permitir el ingreso'});
     return;
@@ -1073,7 +1077,7 @@ async function handleScannedPayload(text){
   if(!record.comidas) record.comidas = MEALS.map(()=>({usado:false, hora:null}));
   if(mode === 'e'){
     if(record.entradaEscaneada && record.entradaEscaneada.usado){
-      logScan('warn', `Entrada YA registrada (${new Date(record.entradaEscaneada.hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:'Registro: ya usado', name:nombreConFamilia(record), sub:'Registrado a las ' + new Date(record.entradaEscaneada.hora).toLocaleTimeString()});
+      logScan('fail', `Entrada YA registrada (${new Date(record.entradaEscaneada.hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:'Registro: ya usado', name:nombreConFamilia(record), sub:'Registrado a las ' + new Date(record.entradaEscaneada.hora).toLocaleTimeString()});
       return;
     }
     record.entradaEscaneada = { usado:true, hora:new Date().toISOString() };
@@ -1085,7 +1089,7 @@ async function handleScannedPayload(text){
     const meal = MEALS[idx];
     const label = `${meal.tipo} (Día ${meal.dia})`;
     if(record.comidas[idx] && record.comidas[idx].usado){
-      logScan('warn', `${label} YA utilizado (${new Date(record.comidas[idx].hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:`D${meal.dia} ${meal.tipo}: ya usado`, name:nombreConFamilia(record), sub:'Usado a las ' + new Date(record.comidas[idx].hora).toLocaleTimeString()});
+      logScan('fail', `${label} YA utilizado (${new Date(record.comidas[idx].hora).toLocaleTimeString()}) — ${record.nombreCompleto}`,{title:`D${meal.dia} ${meal.tipo}: ya usado`, name:nombreConFamilia(record), sub:'Usado a las ' + new Date(record.comidas[idx].hora).toLocaleTimeString()});
       return;
     }
     record.comidas[idx] = { usado:true, hora:new Date().toISOString() };

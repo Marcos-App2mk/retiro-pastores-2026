@@ -357,6 +357,9 @@ window.jsqrReady = new Promise(function(resolve){
   .scan-result{ position:fixed; inset:0; z-index:300; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; color:#fff; cursor:pointer; }
   .scan-result.show{ display:flex; }
   .scan-result.ok{ background:#1F7A3A; } .scan-result.warn{ background:#B8741A; } .scan-result.fail{ background:#B0301F; }
+  /* Colores del registro/escaneo: verde = aprobado y pagado; amarillo = aprobado, debe saldo;
+     naranja = depósito pendiente de aprobación; rojo = rechazado, ya usado o no encontrado */
+  .scan-result.deposit{ background:#E8B90F; color:#2A2100; } .scan-result.pending{ background:#D9661F; }
   .scan-result .big-ico{ font-size:120px; line-height:1; font-weight:800; }
   .scan-result .sr-title{ font-size:30px; font-weight:800; margin:10px 0 6px; letter-spacing:.5px; text-transform:uppercase; }
   .scan-result .sr-name{ font-size:24px; font-weight:700; }
@@ -567,7 +570,7 @@ function hideScanResult(){ const el=document.getElementById('scanResult'); if(el
 function showScanResult(kind, title, name, sub){
   const el = document.getElementById('scanResult'); if(!el) return;
   el.className = 'scan-result show ' + kind;
-  document.getElementById('srIco').textContent = kind === 'ok' ? '✓' : kind === 'warn' ? '!' : '✕';
+  document.getElementById('srIco').textContent = kind === 'ok' ? '✓' : kind === 'deposit' ? '$' : (kind === 'warn' || kind === 'pending') ? '!' : '✕';
   document.getElementById('srTitle').textContent = title || '';
   document.getElementById('srName').textContent = name || '';
   document.getElementById('srSub').textContent = sub || '';
@@ -576,10 +579,10 @@ function showScanResult(kind, title, name, sub){
     const AC = window.AudioContext || window.webkitAudioContext; const ac = new AC(); const o = ac.createOscillator(), g = ac.createGain();
     o.frequency.value = kind === 'ok' ? 880 : 300; o.connect(g); g.connect(ac.destination); g.gain.value = .15; o.start(); o.stop(ac.currentTime + (kind==='ok'?.15:.35));
   }catch(e){}
-  clearTimeout(srTimer); srTimer = setTimeout(hideScanResult, kind === 'ok' ? 1500 : 2600);
+  clearTimeout(srTimer); srTimer = setTimeout(hideScanResult, 2500); // comidas: 2.5 segundos
 }
 function logScan(kind, msg, res){
-  setScanStatus(kind === 'ok' ? 'ok' : kind === 'warn' ? 'warn' : 'fail', msg);
+  setScanStatus(kind === 'ok' ? 'ok' : (kind === 'warn' || kind === 'deposit' || kind === 'pending') ? 'warn' : 'fail', msg);
   if(res) showScanResult(kind, res.title, res.name, res.sub);
   const log = document.getElementById('scanLog');
   const line = document.createElement('div');
@@ -600,9 +603,9 @@ async function handleScannedPayload(text){
     if(j.personas > 1) j.nombre = j.nombre + ' · ' + j.personas + ' PLATOS';
     const payNote = pg.clave === 'completo' ? (pg.precio === 0 ? '✓ SIN COSTO' : '✓ PAGADO') : pg.clave === 'reserva' ? '⚠ DEBE ' + lempiras(pg.saldo) + ' (solo reserva)' : '⚠ PAGO SIN DEFINIR';
   const sub = [payNote, alergia].filter(Boolean).join(' · ');
-  if(j.status === 'ok'){ logScan(j.pago === 'completo' ? 'ok' : 'warn', `${label} válido — ${j.nombre} · ${payNote}`, {title:label, name:j.nombre, sub}); refreshCounts(); }
-  else if(j.status === 'dup'){ const t = new Date(j.hora).toLocaleTimeString(); logScan('warn', `${label} YA utilizado (${t}) — ${j.nombre}`, {title:label + ': ya usado', name:j.nombre, sub:'Usado a las ' + t + ' · ' + payNote}); }
-  else if(j.status === 'pending') logScan('warn', `PENDIENTE de aprobación — ${j.nombre}`, {title:'Pendiente de aprobación', name:j.nombre, sub:'Pásalo a la mesa de registro'});
+  if(j.status === 'ok'){ logScan(pg.clave === 'completo' ? 'ok' : 'deposit', `${label} válido — ${j.nombre} · ${payNote}`, {title:label, name:j.nombre, sub}); refreshCounts(); }
+  else if(j.status === 'dup'){ const t = new Date(j.hora).toLocaleTimeString(); logScan('fail', `${label} YA utilizado (${t}) — ${j.nombre}`, {title:label + ': ya usado', name:j.nombre, sub:'Usado a las ' + t + ' · ' + payNote}); }
+  else if(j.status === 'pending') logScan('pending', `PENDIENTE de aprobación — ${j.nombre}`, {title:'Pendiente de aprobación', name:j.nombre, sub:'Pásalo a la mesa de registro'});
   else if(j.status === 'rejected') logScan('fail', `RECHAZADO — ${j.nombre}`, {title:'Rechazado', name:j.nombre, sub:'No permitir el servicio'});
   else logScan('fail', 'Registro no encontrado.', {title:'Registro no encontrado'});
 }
