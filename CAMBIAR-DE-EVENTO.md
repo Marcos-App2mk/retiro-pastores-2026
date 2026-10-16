@@ -16,6 +16,8 @@ You never need to edit the `.html`, `shared.js` or `api/` files.
    - `nombre`, `tema`, `anio`, `siglas` (ID prefix, e.g. `MUJ` → codes like `MUJ-K7M2QX`)
    - `lugar`, `fechaTexto`, `fechaInicio` (YYYY-MM-DD, used to calculate age), `fechaLimite`
    - `precioTotal`, `reserva`, `edadAviso` (age that triggers the purple "Menor" tag)
+   - `precios` (optional): age-based prices, e.g. free 0–6, L.200 for 7–17, L.600 for 18+. Leave it empty `[]` for one price for everyone. Set `reserva: 0` to turn off partial deposits.
+   - `notaPago` (optional): extra line under the payment instructions (e.g. one deposit can cover a whole family)
    - `banco` (bank, account number, account holder, optional note)
    - `comidas` (the list of meals; add or remove lines — tallies, scanner and Excel adapt automatically)
    - `colorAcento` / `colorAcentoOscuro` (optional button color)
@@ -27,7 +29,7 @@ You never need to edit the `.html`, `shared.js` or `api/` files.
 5. **Database** (Vercel project → Storage / Marketplace → Upstash Redis). Pick one:
    - **Separate database per event (simplest, fully isolated):** create/connect a new Upstash Redis to each project.
    - **One shared database:** connect the same database, then in *Settings → Environment Variables* add `EVENT_ID` with a different short value per event (e.g. `muj2027`). Data is then kept separate.
-6. **PINs** (Environment Variables, per project): `ADMIN_PIN` and `SCANNER_PIN`. There are no default PINs in the code: if a variable is missing, that login stays closed. Redeploy after adding them.
+6. **PINs** (Environment Variables, per project): `ADMIN_PIN` and `SCANNER_PIN`. There are **no default PINs in the code**: if `ADMIN_PIN` is missing, nobody can open `/admin`; if `SCANNER_PIN` is missing, `/scanner` only accepts the admin PIN. Redeploy after adding or changing them.
 7. **Test:** register once, approve it in `/admin`, scan it in `/scanner`, then delete the test record.
 
 ## Checklist
@@ -38,6 +40,7 @@ You never need to edit the `.html`, `shared.js` or `api/` files.
 - [ ] Test registration approved and scanned, then deleted
 
 ## Notes
+- The wording in this copy says "participante" and "retiro" instead of "campista" and "campamento", so it fits any event.
 - Your current CIY deployment keeps working as is: with no `EVENT_ID`, its data stays where it is.
 - Each event gets its own website address, so old events stay intact as an archive.
 - Download the Excel from `/admin` after each event, then you can delete that project's data.

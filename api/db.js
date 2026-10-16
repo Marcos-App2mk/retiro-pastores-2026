@@ -1,25 +1,34 @@
 const { cmd } = require('./_kv');
 
-// Los PIN se configuran SOLO en Vercel (Settings → Environment Variables). Si falta alguno, ese acceso queda cerrado.
-const ADMIN_PIN = process.env.ADMIN_PIN || '';
-const SCANNER_PIN = process.env.SCANNER_PIN || '';
+// Los PIN se configuran SOLO en Vercel (Settings → Environment Variables): ADMIN_PIN y SCANNER_PIN.
+// No hay PIN por defecto: si falta la variable, ese acceso queda bloqueado.
+const ADMIN_PIN = String(process.env.ADMIN_PIN || '').trim();
+const SCANNER_PIN = String(process.env.SCANNER_PIN || '').trim();
 // Si usas la misma base de datos para varios eventos, pon una variable EVENT_ID distinta en cada proyecto de Vercel
 // (por ejemplo: ciy2027, retiro2027). Cada evento queda separado. Si no la pones, funciona como siempre.
-const NS = process.env.EVENT_ID ? String(process.env.EVENT_ID).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40) + ':' : '';
+// Este evento SIEMPRE usa su propio espacio en la base ('retiro2026'), aunque la base sea compartida con CIY.
+// La variable EVENT_ID de Vercel, si existe, lo reemplaza.
+const EVENT_ID_DEFAULT = 'retiro2026';
+const NS = String(process.env.EVENT_ID || EVENT_ID_DEFAULT).replace(/[^A-Za-z0-9_-]/g, '').slice(0, 40) + ':';
 const MAX_COMIDAS = 40;
 const ID_RE = /^[A-Z0-9]{2,8}-[A-Z0-9]{6}$/;
 const COLLECTIONS = ['registrations', 'receipts'];
+// Personas en un registro: 1, o la familia completa (pastor + esposa + hijos) si viene de la calculadora
+function personas(r){ const f = r && r.familia; if(!f) return 1; return 1 + (f.esposa ? 1 : 0) + ((f.hijos || []).length); }
 
 module.exports = async (req, res) => {
   try{
     if(req.method !== 'POST') return res.status(405).json({ error:'method' });
     const { op, c, id, value, pin } = req.body || {};
-    const admin = !!ADMIN_PIN && pin === ADMIN_PIN;
+    const admin = !!ADMIN_PIN && typeof pin === 'string' && pin === ADMIN_PIN;
 
-    if(op === 'auth') return res.json({ ok: admin });
+    if(op === 'auth'){
+      if(!ADMIN_PIN) return res.status(500).json({ error:'Falta la variable ADMIN_PIN en Vercel (Settings → Environment Variables) y luego Redeploy.' });
+      return res.json({ ok: admin });
+    }
 
     // --- Escáner de comidas: acceso limitado (PIN propio o PIN de administrador) ---
-    const scanner = admin || (!!SCANNER_PIN && pin === SCANNER_PIN);
+    const scanner = admin || (!!SCANNER_PIN && typeof pin === 'string' && pin === SCANNER_PIN);
     if(op === 'scan_auth') return res.json({ ok: scanner });
     if(op === 'counts' || op === 'scan'){
       if(!scanner) return res.status(403).json({ error:'scanner' });
@@ -28,21 +37,22 @@ module.exports = async (req, res) => {
         const meals = []; let entradas = 0, aprobados = 0, completos = 0, reservas = 0, sinPago = 0;
         vals.forEach(v => { try{
           const r = JSON.parse(v);
-          if(r.estado === 'aprobado'){ aprobados++; if(r.pago === 'completo') completos++; else if(r.pago === 'reserva') reservas++; else sinPago++; }
-          if(r.entradaEscaneada && r.entradaEscaneada.usado) entradas++;
-          (r.comidas || []).forEach((m,i) => { if(i < MAX_COMIDAS){ while(meals.length <= i) meals.push(0); if(m && m.usado) meals[i]++; } });
+          const np = personas(r);
+          if(r.estado === 'aprobado'){ aprobados += np; if(r.pago === 'completo') completos++; else if(r.pago === 'reserva') reservas++; else sinPago++; }
+          if(r.entradaEscaneada && r.entradaEscaneada.usado) entradas += np;
+          (r.comidas || []).forEach((m,i) => { if(i < MAX_COMIDAS){ while(meals.length <= i) meals.push(0); if(m && m.usado) meals[i] += np; } });
         }catch(e){} });
         return res.json({ meals, entradas, aprobados, inscritos: vals.length, completos, reservas, sinPago });
       }
-      // op === 'scan': registra una comida (o la entrada con mode 'e') de un campista aprobado
+      // op === 'scan': registra una comida (o la entrada con mode 'e') de un participante aprobado
       const sid = String(id || ''), mode = String(req.body.mode);
       if(!ID_RE.test(sid)) return res.json({ status:'notfound' });
       if(mode !== 'e' && !(/^\d+$/.test(mode) && +mode < MAX_COMIDAS)) return res.status(400).json({ error:'mode' });
-      if(mode === 'e' && !admin) return res.status(403).json({ error:'admin' }); // la entrada al campamento solo la registra el administrador
+      if(mode === 'e' && !admin) return res.status(403).json({ error:'admin' }); // la entrada al retiro solo la registra el administrador
       const raw = await cmd('HGET', NS + 'registrations', sid);
       if(!raw) return res.json({ status:'notfound' });
       const rec = JSON.parse(raw);
-      const info = { nombre: rec.nombreCompleto, iglesia: rec.iglesia, alergias: rec.tieneAlergias ? (rec.alergias || 'Sin detalle') : '',
+      const info = { nombre: rec.nombreCompleto, iglesia: rec.iglesia, alergias: rec.tieneAlergias ? (rec.alergias || 'Sin detalle') : '', fn: rec.fechaNacimiento || '', personas: personas(rec), familia: rec.familia || null,
         pago: rec.pago === 'completo' ? 'completo' : rec.pago === 'reserva' ? 'reserva' : 'sin' };
       if(rec.estado === 'pendiente') return res.json(Object.assign({ status:'pending' }, info));
       if(rec.estado !== 'aprobado') return res.json(Object.assign({ status:'rejected' }, info));
@@ -67,10 +77,10 @@ module.exports = async (req, res) => {
       if(c === 'receipts' && !admin) return res.status(403).json({ error:'admin' });
       const v = await cmd('HGET', K, id);
       if(c === 'registrations' && v && !admin){
-        // El campista (o quien conozca el teléfono) solo recibe lo necesario para mostrar sus códigos.
+        // El participante (o quien conozca el teléfono) solo recibe lo necesario para mostrar sus códigos.
         try{
           const r = JSON.parse(v);
-          return res.json({ value: JSON.stringify({ id:r.id, nombreCompleto:r.nombreCompleto, iglesia:r.iglesia, estado:r.estado, creado:r.creado, entradaEscaneada:r.entradaEscaneada, comidas:r.comidas }) });
+          return res.json({ value: JSON.stringify({ id:r.id, nombreCompleto:r.nombreCompleto, iglesia:r.iglesia, estado:r.estado, creado:r.creado, familia:r.familia, costoFamilia:r.costoFamilia, depositoRequerido:r.depositoRequerido, entradaEscaneada:r.entradaEscaneada, comidas:r.comidas }) });
         }catch(e){}
       }
       return res.json({ value: v || null });
@@ -93,7 +103,7 @@ module.exports = async (req, res) => {
       if(typeof value !== 'string' || value.length > 900000) return res.status(400).json({ error:'valor' });
       if(!admin && !ID_RE.test(String(id))) return res.status(400).json({ error:'id' });
       const exists = await cmd('HEXISTS', K, id);
-      if(exists && !admin) return res.json({ ok:true, exists:true }); // un campista no puede modificar un registro existente
+      if(exists && !admin) return res.json({ ok:true, exists:true }); // un participante no puede modificar un registro existente
       let out = value;
       if(!exists && c === 'registrations'){
         // Registro nuevo: siempre entra como pendiente; solo un administrador lo aprueba.
