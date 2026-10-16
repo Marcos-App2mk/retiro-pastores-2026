@@ -267,6 +267,17 @@ window.jsqrReady = new Promise(function(resolve){
   .pay-banner{ border-radius:8px; padding:12px 14px; margin:10px 0 6px; font-weight:800; font-size:15px; color:#fff; }
   .pay-banner.completo{ background:#1F7A3A; } .pay-banner.reserva, .pay-banner.sin{ background:#B8741A; }
   .pay-tag{ display:inline-block; border-radius:10px; padding:2px 8px; font-size:11px; font-weight:800; margin-left:6px; vertical-align:middle; color:#fff; }
+  .pay-right{ margin-top:6px; }
+  /* Estado de pago con el mismo estilo que el estado de aprobación */
+  .camper-row .badge, .pay-right .pay-tag{ display:inline-block; min-width:84px; text-align:center; box-sizing:border-box; }
+  .pay-right .pay-tag{ margin-left:0; font-size:11px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap; letter-spacing:0; }
+  .pay-right .pay-tag.completo{ background:#E6F0E6; color:var(--ok); }
+  .pay-right .pay-tag.reserva, .pay-right .pay-tag.sin{ background:#FBF0DA; color:#9A6412; }
+  /* Un poco más oscuros y con borde fino (lista de registros) */
+  .camper-row .badge, .pay-right .pay-tag{ border:1px solid transparent; }
+  .camper-row .badge.aprobado, .pay-right .pay-tag.completo{ background:#D3E6D6; color:#1F5C38; border-color:#9CC5A6; }
+  .camper-row .badge.pendiente, .pay-right .pay-tag.reserva, .pay-right .pay-tag.sin{ background:#F6E2B8; color:#7A4E0C; border-color:#DDB66A; }
+  .camper-row .badge.rechazado{ background:#F1CFC4; color:#8E2A1E; border-color:#D99A8A; }
   .pay-tag.completo{ background:#1F7A3A; } .pay-tag.reserva, .pay-tag.sin{ background:#B8741A; }
   .allergy-alert{ background:#B0301F; color:#fff; border-radius:8px; padding:12px 14px; margin:10px 0; font-size:15px; font-weight:700; letter-spacing:.3px; }
   .allergy-alert b{ font-size:18px; display:block; margin-top:2px; }
@@ -546,12 +557,13 @@ function renderAdminList(){
     <div class="camper-row clickable" role="button" tabindex="0" onclick="openDatos('${r.id}')" onkeydown="if(event.key==='Enter')openDatos('${r.id}')">
       <div class="top">
         <div>
-          <h3>${n}. ${esc(r.nombreCompleto)}${personasDe(r) > 1 ? '<span class="age-tag" style="background:#2F5D8A">FAMILIA (' + personasDe(r) + ')</span>' : ''}${r.tieneAlergias ? '<span class="allergy-tag">⚠ ALERGIAS</span>' : ''}${esMenor12(r) ? '<span class="age-tag">MENOR (' + edadDe(r) + ')</span>' : ''}${r.estado==='aprobado' ? (()=>{const p=pagoInfo(r); return '<span class="pay-tag '+p.clave+'">'+(p.clave==='completo'?(p.precio===0?'SIN COSTO':'PAGADO'):p.clave==='reserva'?'DEBE '+lempiras(p.saldo):'¿PAGO?')+'</span>';})() : ''}</h3>
+          <h3>${n}. ${esc(r.nombreCompleto)}${personasDe(r) > 1 ? '<span class="age-tag" style="background:#2F5D8A">FAMILIA (' + personasDe(r) + ')</span>' : ''}${r.tieneAlergias ? '<span class="allergy-tag">⚠ ALERGIAS</span>' : ''}${esMenor12(r) ? '<span class="age-tag">MENOR (' + edadDe(r) + ')</span>' : ''}</h3>
           <p>${esc(r.iglesia)}${r.telefono ? ' · Tel: ' + esc(r.telefono) : ''}</p>
           <p class="tick-status">${esc(r.id)} · Entrada: ${entradaUsada ? '✓' : '—'} · Comidas: ${mealsUsed}/${MEALS.length}</p>
         </div>
         <div style="text-align:right;">
           <span class="badge ${r.estado}">${r.estado === 'aprobado' ? 'Aprobado' : r.estado === 'rechazado' ? 'Rechazado' : 'Pendiente'}</span>
+          ${r.estado==='aprobado' ? (()=>{const p=pagoInfo(r); return '<div class="pay-right"><span class="pay-tag '+p.clave+'">'+(p.clave==='completo'?(p.precio===0?'Sin costo':'Pagado'):p.clave==='reserva'?'Debe '+lempiras(p.saldo):'¿Pago?')+'</span></div>';})() : ''}
           <div class="row-open">Abrir ›</div>
         </div>
       </div>
