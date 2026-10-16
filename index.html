@@ -332,6 +332,43 @@
   /* Botones a media anchura (antes ocupaban todo el ancho) */
   .how-btn, .big-scan, .photo-btn, .btn-half{ width:50% !important; min-width:190px; margin-left:auto !important; margin-right:auto !important; box-sizing:border-box; }
   .btn-half{ display:block; }
+  /* ===== Diseño (igual que el panel de administración): botones con borde, sombra y esquinas redondeadas ===== */
+  button.primary, button.ghost, .how-btn, .mode-tabs button, a.btn-like{ border-radius:12px; }
+  button.primary, .how-btn{ border:1.5px solid rgba(0,0,0,.22) !important; box-shadow:0 3px 0 rgba(0,0,0,.18), 0 4px 10px rgba(12,33,23,.16) !important; }
+  button.ghost, .mode-tabs button, a.btn-like{ background:#fff; color:var(--pine-dark); border:1.5px solid #B8CBBB; box-shadow:0 2px 0 rgba(30,74,50,.14), 0 3px 8px rgba(12,33,23,.08); }
+  .mode-tabs button.active{ background:var(--pine); color:#fff; border-color:rgba(0,0,0,.25); }
+  button.ghost:hover, a.btn-like:hover{ border-color:var(--moss); }
+  button.primary:disabled{ box-shadow:none !important; }
+  button.primary:active, button.ghost:active, .how-btn:active, .mode-tabs button:active, a.btn-like:active{ transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,.16) !important; }
+  a.btn-like{ display:flex; align-items:center; justify-content:center; text-align:center; padding:12px 14px; font-weight:700; font-size:15px; text-decoration:none; box-sizing:border-box; }
+
+  /* ===== Dos botones por línea ===== */
+  .nav-buttons, .confirm-actions, .camper-row .row-actions{ display:grid !important; grid-template-columns:1fr 1fr; gap:10px; }
+  .nav-buttons > *, .confirm-actions > *, .camper-row .row-actions > *{ width:100%; min-width:0; margin:0; box-sizing:border-box; }
+  .confirm-actions > :last-child:nth-child(odd), .camper-row .row-actions > :last-child:nth-child(odd){ grid-column:1 / -1; }
+  .nav-buttons > span:empty{ visibility:hidden; }
+
+  /* ===== Cuadros de información: fondo suave, borde fino y esquinas redondeadas ===== */
+  .deadline-note{ background:rgba(232,178,61,.22) !important; border:1px solid rgba(184,116,26,.55) !important; border-left:5px solid #C9952A !important; border-radius:10px !important; color:#3F2504; }
+  .deposit-amount{ background:rgba(232,178,61,.22) !important; border:1.5px solid rgba(184,116,26,.6) !important; border-radius:12px !important; }
+  .save-photo-box{ background:rgba(232,178,61,.18) !important; border:1.5px solid rgba(184,116,26,.55) !important; border-radius:12px !important; }
+  .price-note{ background:rgba(43,122,75,.14) !important; border:1px solid rgba(43,122,75,.45) !important; border-radius:10px !important; }
+  .pay-box{ background:rgba(232,178,61,.16) !important; border:1.5px solid rgba(184,116,26,.55) !important; border-radius:12px !important; }
+  .result-box{ border-radius:10px !important; }
+  .result-box.ok{ background:rgba(31,122,58,.16) !important; border:1px solid rgba(31,122,58,.55) !important; }
+  .result-box.fail{ background:rgba(176,48,31,.14) !important; border:1px solid rgba(176,48,31,.5) !important; }
+  .result-box.working{ background:rgba(232,178,61,.2) !important; border:1px solid rgba(184,116,26,.5) !important; }
+  .calc-sum{ border-radius:12px !important; border-color:rgba(43,122,75,.4) !important; }
+  .calc-sum .dep{ background:rgba(232,178,61,.22) !important; border:1px solid rgba(184,116,26,.55) !important; border-radius:10px !important; }
+  .hijo-box{ border-radius:12px !important; border-color:rgba(43,122,75,.35) !important; }
+  .camper-row{ border-radius:12px !important; }
+  .upload-box{ border-radius:12px !important; }
+  .price-chips span{ border-color:rgba(43,122,75,.35) !important; }
+  .badge{ border:1px solid transparent; }
+  .badge.aprobado{ background:#D3E6D6 !important; color:#1F5C38 !important; border-color:#9CC5A6; }
+  .badge.pendiente{ background:#F6E2B8 !important; color:#7A4E0C !important; border-color:#DDB66A; }
+  .badge.rechazado{ background:#F1CFC4 !important; color:#8E2A1E !important; border-color:#D99A8A; }
+  footer.foot{ border-radius:12px !important; }
 </style>
 </head>
 <body>

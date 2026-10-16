@@ -348,7 +348,7 @@ window.jsqrReady = new Promise(function(resolve){
   .tool-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
   .tool-grid button{ padding:12px 6px; font-size:14px; width:100%; }
   .search-wide{ width:100%; margin-bottom:16px; box-sizing:border-box; }
-  .scan-wrap{ position:relative; max-width:420px; margin:0 auto; }
+  .scan-wrap{ position:relative; max-width:420px; margin:0 auto; overflow:hidden; }
   .scan-wrap video{ width:100%; max-width:none !important; height:min(62vh,460px); object-fit:cover; display:block; }
   .scan-frame{ position:absolute; left:50%; top:50%; width:68%; aspect-ratio:1/1; transform:translate(-50%,-50%); border:3px solid rgba(255,255,255,.9); border-radius:14px; box-shadow:0 0 0 999px rgba(0,0,0,.28); pointer-events:none; }
   .photo-btn{ display:block; width:100%; box-sizing:border-box; text-align:center; padding:20px 12px; border-radius:10px; cursor:pointer; background:var(--ember); color:#fff; font-size:20px; font-weight:800; margin:0 0 10px; }
@@ -368,6 +368,29 @@ window.jsqrReady = new Promise(function(resolve){
     /* Botones a media anchura (antes ocupaban todo el ancho) */
   .how-btn, .big-scan, .photo-btn, .btn-half{ width:50% !important; min-width:190px; margin-left:auto !important; margin-right:auto !important; box-sizing:border-box; }
   .btn-half{ display:block; }
+  /* ===== Diseño: botones con borde, sombra y esquinas redondeadas ===== */
+  button.primary, button.ghost, .photo-btn, .big-scan, a.btn-like{ border-radius:12px; }
+  button.primary, .photo-btn, .big-scan{ border:1.5px solid rgba(0,0,0,.22) !important; box-shadow:0 3px 0 rgba(0,0,0,.18), 0 4px 10px rgba(12,33,23,.16); }
+  button.ghost, a.btn-like{ background:#fff; color:var(--pine-dark); border:1.5px solid #B8CBBB; box-shadow:0 2px 0 rgba(30,74,50,.14), 0 3px 8px rgba(12,33,23,.08); }
+  button.ghost:hover, a.btn-like:hover{ border-color:var(--moss); }
+  button.primary:active, button.ghost:active, .photo-btn:active, .big-scan:active, a.btn-like:active{ transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,.16); }
+  a.btn-like{ display:flex; align-items:center; justify-content:center; text-align:center; padding:12px 14px; font-weight:700; font-size:15px; text-decoration:none; box-sizing:border-box; }
+
+  /* ===== Dos botones por línea (el último, si sobra, ocupa la línea completa) ===== */
+  .btn-row, .modal-box .row-actions{ display:grid !important; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .btn-row > *, .modal-box .row-actions > *{ width:100% !important; min-width:0 !important; margin:0 !important; padding:12px 8px; font-size:14px; box-sizing:border-box; }
+  .btn-row > :last-child:nth-child(odd), .modal-box .row-actions > :last-child:nth-child(odd){ grid-column:1 / -1; }
+  .btn-row .photo-btn{ font-size:15px; padding:12px 8px; display:flex; align-items:center; justify-content:center; }
+
+  /* ===== Avisos (MENOR, ALERGIAS, pago) al 60%: fondo más suave y texto oscuro del mismo color ===== */
+  .allergy-alert{ background:rgba(176,48,31,.6) !important; color:#3D0E07 !important; border:1px solid rgba(176,48,31,.75); }
+  .age-alert{ background:rgba(91,58,158,.6) !important; color:#1E0E40 !important; border:1px solid rgba(91,58,158,.75); }
+  .pay-banner{ border:1px solid transparent; }
+  .pay-banner.completo{ background:rgba(31,122,58,.6) !important; color:#0B3018 !important; border-color:rgba(31,122,58,.75); }
+  .pay-banner.reserva, .pay-banner.sin{ background:rgba(184,116,26,.6) !important; color:#3F2504 !important; border-color:rgba(184,116,26,.75); }
+  .age-tag{ background:rgba(91,58,158,.6) !important; color:#1E0E40 !important; border:1px solid rgba(91,58,158,.75); }
+  .allergy-tag{ background:rgba(176,48,31,.6) !important; color:#3D0E07 !important; border:1px solid rgba(176,48,31,.75); }
+  .fam-tag{ background:rgba(47,93,138,.6) !important; color:#0C2238 !important; border:1px solid rgba(47,93,138,.75); }
 </style>
 </head>
 <body>
@@ -385,8 +408,10 @@ window.jsqrReady = new Promise(function(resolve){
       <p class="hint">Escribe el PIN del escáner.</p>
       <input type="password" id="scanPinInput" inputmode="numeric" autocomplete="off" placeholder="PIN" style="width:100%;padding:14px;font-size:22px;text-align:center;letter-spacing:6px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')doLogin()">
       <p id="loginErr" style="color:var(--bad);font-weight:700;min-height:20px;margin:8px 0;"></p>
-      <button class="primary btn-half" style="padding:16px;font-size:18px;" onclick="doLogin()">Entrar</button>
-      <a href="./" class="ghost btn-half" style="text-align:center;margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:6px;text-decoration:none;color:var(--pine-dark);font-weight:700;">← Salir y volver al registro</a>
+      <div class="btn-row" style="margin-top:14px;">
+        <button class="primary" style="font-size:17px;" onclick="doLogin()">Entrar</button>
+        <a href="./" class="btn-like">← Volver al registro</a>
+      </div>
     </div>
 
     <div class="card" id="scanCard" style="display:none;">
@@ -406,7 +431,7 @@ window.jsqrReady = new Promise(function(resolve){
         <div class="tally-body"><table class="tally-table" id="tallyTable"></table><p class="small-note" id="tallyNote"></p></div>
       </details>
       <div class="scan-log" id="scanLog"></div>
-      <div class="nav-buttons"><button class="ghost" onclick="logout()">Cerrar sesión</button><button class="ghost" onclick="location.href='./'">← Volver al registro</button></div>
+      <div class="btn-row"><button class="ghost" onclick="logout()">Cerrar sesión</button><button class="ghost" onclick="location.href='./'">← Volver al registro</button></div>
     </div>
   </main></div>
 </div>
@@ -456,12 +481,12 @@ function renderCounts(){
   const total = counts.meals.reduce((a,b)=>a+b,0);
   document.getElementById('totalSmall').textContent = '— ' + total + ' en total';
   document.getElementById('tallyTable').innerHTML = '<tr><th>Comida</th><th class="n">Servidas</th></tr>' +
-    MEALS.map((m,i)=>`<tr><td>Día ${m.dia} — ${esc(m.tipo)}</td><td class="n">${counts.meals[i]}</td></tr>`).join('') +
+    MEALS.map((m,i)=>`<tr><td>Día ${m.dia} — ${esc(m.tipo)}</td><td class="n">${counts.meals[i] || 0}</td></tr>`).join('') +
     `<tr class="total"><td>Total de comidas servidas</td><td class="n">${total}</td></tr>`;
   document.getElementById('tallyNote').textContent = `Entradas registradas: ${counts.entradas} · Aprobados: ${counts.aprobados} · Inscritos: ${counts.inscritos}`;
   const sel = document.getElementById('mealSelect'), el = document.getElementById('mealCounter');
   if(sel.value === 'e') el.textContent = `Entradas registradas: ${counts.entradas} de ${counts.aprobados} aprobados`;
-  else { const i = parseInt(sel.value)||0; el.textContent = `Día ${MEALS[i].dia} — ${MEALS[i].tipo}: ${counts.meals[i]} servidas de ${counts.aprobados} aprobados`; }
+  else { const i = parseInt(sel.value)||0; el.textContent = `Día ${MEALS[i].dia} — ${MEALS[i].tipo}: ${counts.meals[i] || 0} servidas de ${counts.aprobados} aprobados`; }
 }
 let scanStream = null, scanning = false;
 async function startScanner(){

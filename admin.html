@@ -368,7 +368,7 @@ window.jsqrReady = new Promise(function(resolve){
   .tool-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:12px; }
   .tool-grid button{ padding:12px 6px; font-size:14px; width:100%; }
   .search-wide{ width:100%; margin-bottom:16px; box-sizing:border-box; }
-  .scan-wrap{ position:relative; max-width:420px; margin:0 auto; }
+  .scan-wrap{ position:relative; max-width:420px; margin:0 auto; overflow:hidden; }
   .scan-wrap video{ width:100%; max-width:none !important; height:min(62vh,460px); object-fit:cover; display:block; }
   .scan-frame{ position:absolute; left:50%; top:50%; width:68%; aspect-ratio:1/1; transform:translate(-50%,-50%); border:3px solid rgba(255,255,255,.9); border-radius:14px; box-shadow:0 0 0 999px rgba(0,0,0,.28); pointer-events:none; }
   .photo-btn{ display:block; width:100%; box-sizing:border-box; text-align:center; padding:20px 12px; border-radius:10px; cursor:pointer; background:var(--ember); color:#fff; font-size:20px; font-weight:800; margin:0 0 10px; }
@@ -388,6 +388,32 @@ window.jsqrReady = new Promise(function(resolve){
     /* Botones a media anchura (antes ocupaban todo el ancho) */
   .how-btn, .big-scan, .photo-btn, .btn-half{ width:50% !important; min-width:190px; margin-left:auto !important; margin-right:auto !important; box-sizing:border-box; }
   .btn-half{ display:block; }
+  /* ===== Diseño: botones con borde, sombra y esquinas redondeadas ===== */
+  button.primary, button.ghost, .photo-btn, .big-scan, a.btn-like{ border-radius:12px; }
+  button.primary, .photo-btn, .big-scan{ border:1.5px solid rgba(0,0,0,.22) !important; box-shadow:0 3px 0 rgba(0,0,0,.18), 0 4px 10px rgba(12,33,23,.16); }
+  button.ghost, a.btn-like{ background:#fff; color:var(--pine-dark); border:1.5px solid #B8CBBB; box-shadow:0 2px 0 rgba(30,74,50,.14), 0 3px 8px rgba(12,33,23,.08); }
+  button.ghost:hover, a.btn-like:hover{ border-color:var(--moss); }
+  button.primary:active, button.ghost:active, .photo-btn:active, .big-scan:active, a.btn-like:active{ transform:translateY(2px); box-shadow:0 1px 0 rgba(0,0,0,.16); }
+  a.btn-like{ display:flex; align-items:center; justify-content:center; text-align:center; padding:12px 14px; font-weight:700; font-size:15px; text-decoration:none; box-sizing:border-box; }
+
+  /* ===== Dos botones por línea (el último, si sobra, ocupa la línea completa) ===== */
+  .btn-row, .modal-box .row-actions{ display:grid !important; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0; }
+  .btn-row > *, .modal-box .row-actions > *{ width:100% !important; min-width:0 !important; margin:0 !important; padding:12px 8px; font-size:14px; box-sizing:border-box; }
+  .btn-row > :last-child:nth-child(odd), .modal-box .row-actions > :last-child:nth-child(odd){ grid-column:1 / -1; }
+  .btn-row .photo-btn{ font-size:15px; padding:12px 8px; display:flex; align-items:center; justify-content:center; }
+  /* Un botón solo en su línea: más angosto y centrado, para no confundirlo con las barras de aviso */
+  .btn-row > :only-child, .modal-box .row-actions > :only-child{ grid-column:1 / -1; justify-self:center; width:62% !important; min-width:200px !important; }
+  .pay-banner + .btn-row{ margin-top:14px; }
+
+  /* ===== Avisos (MENOR, ALERGIAS, pago) al 60%: fondo más suave y texto oscuro del mismo color ===== */
+  .allergy-alert{ background:rgba(176,48,31,.6) !important; color:#3D0E07 !important; border:1px solid rgba(176,48,31,.75); }
+  .age-alert{ background:rgba(91,58,158,.6) !important; color:#1E0E40 !important; border:1px solid rgba(91,58,158,.75); }
+  .pay-banner{ border:1px solid transparent; }
+  .pay-banner.completo{ background:rgba(31,122,58,.6) !important; color:#0B3018 !important; border-color:rgba(31,122,58,.75); }
+  .pay-banner.reserva, .pay-banner.sin{ background:rgba(184,116,26,.6) !important; color:#3F2504 !important; border-color:rgba(184,116,26,.75); }
+  .age-tag{ background:rgba(91,58,158,.6) !important; color:#1E0E40 !important; border:1px solid rgba(91,58,158,.75); }
+  .allergy-tag{ background:rgba(176,48,31,.6) !important; color:#3D0E07 !important; border:1px solid rgba(176,48,31,.75); }
+  .fam-tag{ background:rgba(47,93,138,.6) !important; color:#0C2238 !important; border:1px solid rgba(47,93,138,.75); }
 </style>
 </head>
 <body>
@@ -407,8 +433,10 @@ window.jsqrReady = new Promise(function(resolve){
         <p class="hint">Escribe el PIN de administrador.</p>
         <input type="password" id="adminPinInput" inputmode="numeric" autocomplete="off" placeholder="PIN" style="width:100%;padding:14px;font-size:22px;text-align:center;letter-spacing:6px;box-sizing:border-box;" onkeydown="if(event.key==='Enter')doAdminLogin()">
         <p class="pin-error" id="pinError" style="min-height:20px;margin:8px 0;"></p>
-        <button class="primary btn-half" style="padding:16px;font-size:18px;" onclick="doAdminLogin()">Entrar</button>
-        <a href="./" class="ghost btn-half" style="text-align:center;margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:6px;text-decoration:none;color:var(--pine-dark);font-weight:700;">← Salir y volver al registro</a>
+        <div class="btn-row" style="margin-top:14px;">
+          <button class="primary" style="font-size:17px;" onclick="doAdminLogin()">Entrar</button>
+          <a href="./" class="btn-like">← Volver al registro</a>
+        </div>
       </div>
 
       <div class="card" id="adminDashCard" style="display:none;">
@@ -439,14 +467,14 @@ window.jsqrReady = new Promise(function(resolve){
           <div id="mealCounter" class="meal-counter"></div>
           <div class="scan-wrap"><video id="scanVideo" autoplay muted playsinline></video><div class="scan-frame"></div></div>
           <div class="scan-tip">Centra el QR dentro del cuadro y acércate hasta que llene la mitad. Si el QR está en otra pantalla, baja el brillo o aléjate un poco para evitar las líneas de la pantalla.</div>
-          <div style="margin:12px 0 0;">
+          <div class="btn-row" style="margin:12px 0 0;">
             <label class="photo-btn" for="photoScan">📷 Tomar foto del QR</label>
-            <input type="file" id="photoScan" accept="image/*" capture="environment" style="display:none;" onchange="scanFromPhoto(event)">
+            <button class="ghost" onclick="closeScanner()">Cerrar escáner</button>
           </div>
+          <input type="file" id="photoScan" accept="image/*" capture="environment" style="display:none;" onchange="scanFromPhoto(event)">
           <canvas id="scanCanvas" style="display:none;"></canvas>
           <div class="scan-status idle" id="scanStatus">Buscando código…</div>
           <div class="scan-log" id="scanLog"></div>
-          <div class="nav-buttons"><button class="ghost" onclick="closeScanner()">Cerrar escáner</button><span></span></div>
         </div>
       </div>
     </main>
@@ -560,7 +588,7 @@ function renderAdminList(){
     <div class="camper-row clickable" role="button" tabindex="0" onclick="openDatos('${r.id}')" onkeydown="if(event.key==='Enter')openDatos('${r.id}')">
       <div class="top">
         <div>
-          <h3>${n}. ${esc(r.nombreCompleto)}${personasDe(r) > 1 ? '<span class="age-tag" style="background:#2F5D8A">FAMILIA (' + personasDe(r) + ')</span>' : ''}${r.tieneAlergias ? '<span class="allergy-tag">⚠ ALERGIAS</span>' : ''}${esMenor12(r) ? '<span class="age-tag">MENOR (' + edadDe(r) + ')</span>' : ''}</h3>
+          <h3>${n}. ${esc(r.nombreCompleto)}${personasDe(r) > 1 ? '<span class="age-tag fam-tag">FAMILIA (' + personasDe(r) + ')</span>' : ''}${r.tieneAlergias ? '<span class="allergy-tag">⚠ ALERGIAS</span>' : ''}${esMenor12(r) ? '<span class="age-tag">MENOR (' + edadDe(r) + ')</span>' : ''}</h3>
           <p>${esc(r.iglesia)}${r.telefono ? ' · Tel: ' + esc(r.telefono) : ''}</p>
           <p class="tick-status">${esc(r.id)} · Entrada: ${entradaUsada ? '✓' : '—'} · Comidas: ${mealsUsed}/${MEALS.length}</p>
         </div>
@@ -577,7 +605,7 @@ function renderAdminList(){
 async function exportSpreadsheet(){
   if(!allRegistrations.length){ toast('No hay registros para exportar todavía.'); return; }
   const mealHeaders = MEALS.map(m => `${m.tipo} D${m.dia}`);
-  const headers = ['#','ID','Nombre completo','Fecha nacimiento','Edad al ' + (EV.fechaInicio || 'inicio'),'Teléfono','Iglesia','Encargado',...(PEDIR_EMERGENCIA ? ['Contacto de emergencia','Número de emergencia'] : []), ...(PEDIR_BAUTIZO ? ['Bautizado'] : []),'Alergias','Detalle de alergias','Personas','Familia','Categoría','Costo (L.)','Pago','Monto pagado (L.)','Saldo pendiente (L.)','Estado',
+  const headers = ['#','ID','Nombre completo','Fecha nacimiento','Edad al ' + (EV.fechaInicio || 'inicio'),'Teléfono','Iglesia','Encargado',...(PEDIR_EMERGENCIA ? ['Contacto de emergencia','Número de emergencia'] : []), ...(PEDIR_BAUTIZO ? ['Bautizado'] : []),'Alergias','Detalle de alergias','Personas','Familia','Categoría','Costo (L.)','Pago','Monto pagado (L.)','Saldo pendiente (L.)','Saldo pagado en el retiro (L.)','Método del saldo','Referencia transferencia','Fecha pago del saldo','Estado',
     'Revisado manualmente',
     'Fecha de registro','Entrada usada','Hora de entrada', ...mealHeaders];
 
@@ -590,6 +618,7 @@ async function exportSpreadsheet(){
       r.estado === 'aprobado' ? (precioDe(r)===0?'Sin costo':r.pago==='completo'?'Pago completo':r.pago==='reserva'?'Reserva':'Sin definir') : '',
       r.estado === 'aprobado' ? pagoInfo(r).pagado : 0,
       r.estado === 'aprobado' ? pagoInfo(r).saldo : '',
+      r.saldoPago ? (Number(r.saldoPago.monto)||0) : '', r.saldoPago ? (METODO_TXT[r.saldoPago.metodo] || r.saldoPago.metodo) : '', r.saldoPago ? (r.saldoPago.referencia || '') : '', r.saldoPago ? new Date(r.saldoPago.fecha).toLocaleString() : '',
       r.estado === 'aprobado' ? 'Aprobado' : r.estado === 'rechazado' ? 'Rechazado' : 'Pendiente',
       r.revisadoManualmente ? 'Sí' : 'No',
       r.creado ? new Date(r.creado).toLocaleString() : '',
@@ -609,7 +638,7 @@ async function exportSpreadsheet(){
   XLSX.utils.book_append_sheet(wb, ws, 'Registros');
   const st = mealStats();
   const sum = [['Comida','Servidas'], ...st.meals.map(m=>[m.label, m.served]), ['Total de comidas servidas', st.totalMeals], [],
-    ['Entradas registradas', st.entradas], ['Pago completo', st.pagos.completos], ['Solo reserva', st.pagos.reservas], ['Pago sin definir', st.pagos.sin], ['Total cobrado (L.)', st.pagos.cobrado], ['Saldo por cobrar (L.)', st.pagos.pendiente], ['Inscritos aprobados', st.aprobados], ['Inscritos en total', st.inscritos], [],
+    ['Entradas registradas', st.entradas], ['Pago completo', st.pagos.completos], ['Solo reserva', st.pagos.reservas], ['Pago sin definir', st.pagos.sin], ['Depósitos con comprobante (L.)', st.pagos.depositos], ['Saldos en efectivo (L.)', st.pagos.efectivo], ['Saldos por transferencia (L.)', st.pagos.transfer], ['Total cobrado (L.)', st.pagos.cobrado], ['Saldo por cobrar (L.)', st.pagos.pendiente], ['Inscritos aprobados', st.aprobados], ['Inscritos en total', st.inscritos], [],
     ['Iglesia','Inscritos','Entraron','Comidas servidas'], ...st.churches.map(c=>[c.nombre, c.inscritos, c.entradas, c.comidas]),
     ['Total', st.inscritos, st.entradas, st.totalMeals]];
   const ws2 = XLSX.utils.aoa_to_sheet(sum); ws2['!cols'] = [{ wch:34 },{ wch:12 },{ wch:12 },{ wch:18 }];
@@ -630,7 +659,7 @@ async function exportSpreadsheet(){
 
 let pendienteDesdeEscaneo = null;
 async function setEstado(id, estado, reopen, pago){
-  let cobrarDespues = null;
+  let cobrarDespues = null, entradaListaDesdeEscaneo = false;
   try{
     const res = await window.storage.get('registrations:'+id, true);
     if(!res) { toast('Registro no encontrado.'); return; }
@@ -653,6 +682,7 @@ async function setEstado(id, estado, reopen, pago){
     const w = await window.storage.set('registrations:'+id, JSON.stringify(record), true);
     if(!w.synced){ toast('No se pudo guardar el cambio en la base compartida.'); cobrarDespues = null; }
     else if(entradaMarcada){
+      entradaListaDesdeEscaneo = true;
       const p = pagoInfo(record);
       showScanResult('ok', 'Aprobado · entrada registrada', nombreConFamilia(record), p.precio === 0 ? '✓ SIN COSTO' : '✓ PAGADO');
     }
@@ -660,6 +690,7 @@ async function setEstado(id, estado, reopen, pago){
   }catch(e){ toast('Error al guardar el cambio.'); }
   await loadRegistrations();
   if(cobrarDespues){ openCobro(cobrarDespues); return; }
+  if(entradaListaDesdeEscaneo){ closeModal(); openScanner(); return; }   // mesa de registro: listo para el siguiente
   if(reopen) openDatos(id);
 }
 
@@ -677,34 +708,52 @@ function openCobro(r){
       <tr><td><b>Saldo a cobrar</b></td><td><b>${lempiras(p.saldo)}</b></td></tr>
     </table>
     ${r.tieneAlergias ? `<div class="allergy-alert">⚠️ ALERGIAS<br><b>${esc(r.alergias || 'Sin detalle')}</b></div>` : ''}
-    <div class="row-actions" style="margin-top:14px;flex-direction:column;gap:10px;">
-      <button class="primary" style="background:var(--ok);padding:14px;font-size:17px;" onclick="cobrarYEntrar('${esc(r.id)}')">💰 Recibí ${lempiras(p.saldo)} · registrar entrada</button>
-      <button class="ghost" onclick="closeModal()">Todavía no paga (no registrar entrada)</button>
-    </div>`;
+    <p class="tally-h" style="margin:14px 0 4px;">¿Cómo pagó el saldo de ${lempiras(p.saldo)}?</p>
+    <div class="row-actions" style="margin-top:6px;">
+      <button class="primary" style="background:var(--ok);" onclick="cobrarYEntrar('${esc(r.id)}','efectivo')">💵 Efectivo<br><small>${lempiras(p.saldo)} · registrar entrada</small></button>
+      <button class="primary" style="background:#2F5D8A;" onclick="cobrarYEntrar('${esc(r.id)}','transferencia')">🏦 Transferencia<br><small>${lempiras(p.saldo)} · registrar entrada</small></button>
+    </div>
+    <input type="text" id="refSaldo" placeholder="N.º de referencia de la transferencia (opcional)" style="margin:2px 0 10px;">
+    <div class="row-actions"><button class="ghost" onclick="closeModal(); openScanner();">Todavía no paga · volver al escáner</button></div>`;
   document.getElementById('modalOverlay').classList.add('active');
 }
-async function cobrarYEntrar(id){
+/* Registra el pago del saldo: método (efectivo / transferencia), monto, referencia y fecha */
+const METODO_TXT = { efectivo:'Efectivo', transferencia:'Transferencia' };
+function registrarSaldo(rec, metodo, referencia, lugar){
+  const saldo = pagoInfo(rec).saldo;
+  rec.pago = 'completo'; rec.montoPagado = pagoInfo(rec).pagado; rec.fechaPago = new Date().toISOString();
+  rec.saldoPago = { metodo, monto: saldo, referencia: (metodo === 'transferencia' ? (referencia || '') : ''), fecha: rec.fechaPago, lugar: lugar || 'mesa' };
+}
+function saldoTexto(r){
+  const s = r && r.saldoPago; if(!s) return '';
+  return 'Saldo ' + lempiras(s.monto) + ' · ' + (METODO_TXT[s.metodo] || s.metodo) + (s.referencia ? ' · ref. ' + s.referencia : '') + ' · ' + new Date(s.fecha).toLocaleString();
+}
+async function cobrarYEntrar(id, metodo){
   try{
+    const ref = ((document.getElementById('refSaldo') || {}).value || '').trim();
     const res = await window.storage.get('registrations:'+id, true);
     if(!res){ toast('Registro no encontrado.'); return; }
     const rec = JSON.parse(res.value);
-    rec.pago = 'completo'; rec.montoPagado = pagoInfo(rec).pagado; rec.fechaPago = new Date().toISOString();
+    registrarSaldo(rec, metodo || 'efectivo', ref, 'mesa');
     if(!(rec.entradaEscaneada && rec.entradaEscaneada.usado)) rec.entradaEscaneada = { usado:true, hora:new Date().toISOString() };
     const w = await window.storage.set('registrations:'+id, JSON.stringify(rec), true);
     if(!w.synced){ toast('No se pudo guardar. Intenta de nuevo.'); return; }
     closeModal();
-    showScanResult('ok', 'Pagado · entrada registrada', nombreConFamilia(rec), '✓ PAGADO' + (rec.tieneAlergias ? ' · ⚠ ALERGIAS: ' + rec.alergias : ''));
+    openScanner();   // listo para el siguiente en la fila
+    showScanResult('ok', 'Pagado · entrada registrada', nombreConFamilia(rec), '✓ PAGADO · ' + (METODO_TXT[rec.saldoPago.metodo] || '') + (rec.tieneAlergias ? ' · ⚠ ALERGIAS: ' + rec.alergias : ''));
   }catch(e){ toast('Error al guardar.'); }
   await loadRegistrations();
 }
 
 function openModal(id){ openDatos(id); }
-async function cambiarPago(id, pago){
+async function cambiarPago(id, pago, metodo){
   try{
+    const ref = ((document.getElementById('refSaldoDet') || {}).value || '').trim();
     const res = await window.storage.get('registrations:'+id, true);
     if(!res){ toast('Registro no encontrado.'); return; }
     const rec = JSON.parse(res.value);
-    rec.pago = pago; rec.montoPagado = pagoInfo(rec).pagado; rec.fechaPago = new Date().toISOString();
+    if(pago === 'completo' && metodo){ registrarSaldo(rec, metodo, ref, 'panel'); }
+    else { rec.pago = pago; rec.montoPagado = pagoInfo(rec).pagado; rec.fechaPago = new Date().toISOString(); if(pago !== 'completo') delete rec.saldoPago; }
     const w = await window.storage.set('registrations:'+id, JSON.stringify(rec), true);
     if(!w.synced){ toast('No se pudo guardar el cambio.'); return; }
     toast('Pago actualizado: ' + pagoInfo(rec).texto);
@@ -747,6 +796,12 @@ function mealStats(){
   const pagos = { completos: ap.filter(r=>r.pago==='completo').length, reservas: ap.filter(r=>r.pago==='reserva').length, sin: ap.filter(r=>r.pago!=='completo' && r.pago!=='reserva').length };
   pagos.cobrado = ap.reduce((t,r)=>t + pagoInfo(r).pagado, 0);
   pagos.pendiente = ap.reduce((t,r)=>t + pagoInfo(r).saldo, 0);
+  const conSaldo = ap.filter(r=>r.saldoPago && r.pago === 'completo');
+  pagos.efectivoN = conSaldo.filter(r=>r.saldoPago.metodo==='efectivo').length;
+  pagos.efectivo = conSaldo.filter(r=>r.saldoPago.metodo==='efectivo').reduce((t,r)=>t + (Number(r.saldoPago.monto)||0), 0);
+  pagos.transferN = conSaldo.filter(r=>r.saldoPago.metodo==='transferencia').length;
+  pagos.transfer = conSaldo.filter(r=>r.saldoPago.metodo==='transferencia').reduce((t,r)=>t + (Number(r.saldoPago.monto)||0), 0);
+  pagos.depositos = pagos.cobrado - pagos.efectivo - pagos.transfer;
   return { meals, entradas, totalMeals, aprobados, inscritos: regs.reduce((t,r)=>t + personasDe(r), 0), churches, pagos };
 }
 function renderTally(){
@@ -768,7 +823,10 @@ function renderTally(){
         <tr><td>Pago completo${PRECIOS ? '' : ' (' + lempiras(PRECIO_TOTAL) + ')'}</td><td class="n">${st.pagos.completos}</td></tr>
         ${RESERVA_ACTIVA ? `<tr><td>Solo reserva (${lempiras(PRECIO_RESERVA)})</td><td class="n">${st.pagos.reservas}</td></tr>` : ''}
         <tr><td>Sin definir</td><td class="n">${st.pagos.sin}</td></tr>
-        <tr><td>Total cobrado</td><td class="n">${lempiras(st.pagos.cobrado)}</td></tr>
+        <tr><td>Depósitos con comprobante</td><td class="n">${lempiras(st.pagos.depositos)}</td></tr>
+        <tr><td>Saldos en efectivo (${st.pagos.efectivoN})</td><td class="n">${lempiras(st.pagos.efectivo)}</td></tr>
+        <tr><td>Saldos por transferencia (${st.pagos.transferN})</td><td class="n">${lempiras(st.pagos.transfer)}</td></tr>
+        <tr><td><b>Total cobrado</b></td><td class="n"><b>${lempiras(st.pagos.cobrado)}</b></td></tr>
         <tr class="total"><td>Saldo por cobrar</td><td class="n">${lempiras(st.pagos.pendiente)}</td></tr>
       </table>
       <p class="tally-h">Por iglesia</p>
@@ -784,7 +842,7 @@ function tallyText(){
   const st = mealStats();
   const L = [(EV.nombre || 'Evento') + ' — Resumen de comidas', new Date().toLocaleString(), ''];
   st.meals.forEach(m=>L.push(`${m.label}: ${m.served}`));
-  L.push('', `Pagos: ${st.pagos.completos} completos, ${st.pagos.reservas} solo reserva. Cobrado ${lempiras(st.pagos.cobrado)}, por cobrar ${lempiras(st.pagos.pendiente)}`, `Total de comidas servidas: ${st.totalMeals}`, `Entradas registradas: ${st.entradas} de ${st.aprobados} aprobados (${st.inscritos} inscritos)`, '', 'Por iglesia:');
+  L.push('', `Pagos: ${st.pagos.completos} completos, ${st.pagos.reservas} solo reserva. Cobrado ${lempiras(st.pagos.cobrado)} (depósitos ${lempiras(st.pagos.depositos)}, saldos en efectivo ${lempiras(st.pagos.efectivo)}, por transferencia ${lempiras(st.pagos.transfer)}), por cobrar ${lempiras(st.pagos.pendiente)}`, `Total de comidas servidas: ${st.totalMeals}`, `Entradas registradas: ${st.entradas} de ${st.aprobados} aprobados (${st.inscritos} inscritos)`, '', 'Por iglesia:');
   st.churches.forEach(c=>L.push(`${c.nombre}: ${c.inscritos} inscritos, ${c.entradas} entraron, ${c.comidas} comidas`));
   return L.join('\n');
 }
@@ -816,7 +874,11 @@ function openDatos(id){
     ${esMenor12(r) ? `<div class="age-alert">MENOR (${edadDe(r)})<br><b>Menor de ${EDAD_AVISO} años al iniciar el evento (${esc(EV.fechaTexto || '')})</b></div>` : ''}
     ${r.tieneAlergias ? `<div class="allergy-alert">⚠️ ALERGIAS<br><b>${esc(r.alergias || 'Sin detalle')}</b></div>` : ''}
     ${r.estado === 'aprobado' ? (()=>{ const p = pagoInfo(r); return `<div class="pay-banner ${p.clave}">${p.clave==='completo' ? (p.precio===0 ? '✓ SIN COSTO' : '✓ PAGO COMPLETO · ' + lempiras(p.precio)) : p.clave==='reserva' ? '⚠ RESERVA ' + lempiras(p.pagado) + ' — DEBE ' + lempiras(p.saldo) : '⚠ APROBADO SIN DEFINIR PAGO'}</div>
-      <div class="btn-row">${p.clave !== 'completo' ? `<button class="primary" style="background:var(--ok);" onclick="cambiarPago('${esc(r.id)}','completo')">💰 Marcar pago completo</button>` : ''}${p.clave !== 'reserva' && RESERVA_ACTIVA && p.precio > PRECIO_RESERVA ? `<button class="ghost" onclick="cambiarPago('${esc(r.id)}','reserva')">Cambiar a reserva ${lempiras(Math.min(PRECIO_RESERVA, p.precio))}</button>` : ''}</div>`; })() : ''}
+      ${r.saldoPago ? `<p class="small-note" style="margin:-2px 0 8px;"><b>${esc(saldoTexto(r))}</b></p>` : ''}
+      ${p.clave === 'reserva' ? `<p class="tally-h" style="margin:12px 0 4px;">Registrar el pago del saldo (${lempiras(p.saldo)}):</p>
+      <div class="btn-row" style="margin-top:4px;"><button class="primary" style="background:var(--ok);" onclick="cambiarPago('${esc(r.id)}','completo','efectivo')">💵 Efectivo</button><button class="primary" style="background:#2F5D8A;" onclick="cambiarPago('${esc(r.id)}','completo','transferencia')">🏦 Transferencia</button></div>
+      <input type="text" id="refSaldoDet" placeholder="N.º de referencia de la transferencia (opcional)" style="margin:0 0 8px;">` : ''}
+      <div class="btn-row">${p.clave === 'sin' ? `<button class="primary" style="background:var(--ok);" onclick="cambiarPago('${esc(r.id)}','completo')">💰 Marcar pago completo</button>` : ''}${p.clave !== 'reserva' && RESERVA_ACTIVA && p.precio > PRECIO_RESERVA ? `<button class="ghost" onclick="cambiarPago('${esc(r.id)}','reserva')">${r.saldoPago ? '↩ Deshacer pago del saldo' : 'Cambiar a reserva ' + lempiras(Math.min(PRECIO_RESERVA, p.precio))}</button>` : ''}</div>`; })() : ''}
     <div class="detail-sec">Comprobante de pago</div>
     <div id="receiptSlot" class="receipt-box"><p class="hint">Cargando comprobante…</p></div>
     <div class="btn-row">
@@ -1139,7 +1201,7 @@ async function handleScannedPayload(text){
     }
     if(pg.clave !== 'completo'){
       // Reserva aprobada pero debe saldo: NO se registra la entrada hasta cobrar
-      logScan('deposit', `Debe ${lempiras(pg.saldo)} — ${record.nombreCompleto}. Entrada NO registrada.`,{title:'Cobrar saldo', name:nombreConFamilia(record), sub:'Debe ' + lempiras(pg.saldo) + ' · entrada no registrada'});
+      logScan('deposit', `Debe ${lempiras(pg.saldo)} — ${record.nombreCompleto}. Entrada NO registrada.`);   // sin aviso grande: la pantalla "Cobrar saldo" ya lo muestra
       closeScanner();
       openCobro(record);
       return;
