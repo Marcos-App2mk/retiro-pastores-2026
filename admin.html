@@ -1136,7 +1136,7 @@ function hideScanResult(){ const el=document.getElementById('scanResult'); if(el
 function showScanResult(kind, title, name, sub){
   const el = document.getElementById('scanResult'); if(!el) return;
   el.className = 'scan-result show ' + kind;
-  document.getElementById('srIco').textContent = kind === 'ok' ? '✓' : kind === 'deposit' ? '$' : (kind === 'warn' || kind === 'pending') ? '!' : '✕';
+  document.getElementById('srIco').textContent = kind === 'ok' ? '✓' : kind === 'deposit' ? 'L' : (kind === 'warn' || kind === 'pending') ? '!' : '✕';
   document.getElementById('srTitle').textContent = title || '';
   document.getElementById('srName').textContent = name || '';
   document.getElementById('srSub').textContent = sub || '';
@@ -1201,7 +1201,8 @@ async function handleScannedPayload(text){
     }
     if(pg.clave !== 'completo'){
       // Reserva aprobada pero debe saldo: NO se registra la entrada hasta cobrar
-      logScan('deposit', `Debe ${lempiras(pg.saldo)} — ${record.nombreCompleto}. Entrada NO registrada.`);   // sin aviso grande: la pantalla "Cobrar saldo" ya lo muestra
+      // Aviso grande amarillo primero; debajo queda abierta la pantalla "Cobrar saldo"
+      logScan('deposit', `Debe ${lempiras(pg.saldo)} — ${record.nombreCompleto}. Entrada NO registrada.`,{title:'Pago requerido', name:nombreConFamilia(record), sub:'Debe ' + lempiras(pg.saldo) + ' · cobrar antes de registrar la entrada' + (record.tieneAlergias ? ' · ⚠ ALERGIAS' : '')});
       closeScanner();
       openCobro(record);
       return;
